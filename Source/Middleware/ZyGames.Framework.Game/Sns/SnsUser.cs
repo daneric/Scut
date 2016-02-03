@@ -23,49 +23,43 @@ THE SOFTWARE.
 ****************************************************************************/
 using System;
 
-namespace ZyGames.Framework.Game.Sns
-{
+namespace ZyGames.Framework.Game.Sns {
     /// <summary>
     /// 
     /// </summary>
     [Serializable]
-    public class SnsUser
-    {
+    public class SnsUser {
         /// <summary>
         /// 微信号OpenID
         /// </summary>
-        public string WeixinCode
-        {
+        public string WeixinCode {
             get;
             set;
         }
         /// <summary>
         /// 
         /// </summary>
-        public string IMEI { get; set; }
+        public string DeviceId { get; set; }
 
 
         /// <summary>
         /// 
         /// </summary>
-        public int UserId
-        {
+        public int UserId {
             get;
             set;
         }
         /// <summary>
         /// 
         /// </summary>
-        public string PassportId
-        {
+        public string PassportId {
             get;
             set;
         }
         /// <summary>
         /// 
         /// </summary>
-        public string Password
-        {
+        public string Password {
             get;
             set;
         }
@@ -81,80 +75,70 @@ namespace ZyGames.Framework.Game.Sns
         /// <summary>
         /// 
         /// </summary>
-        public string RetailID
-        {
+        public string RetailId {
             get;
             set;
         }
         /// <summary>
         /// 
         /// </summary>
-        public string RetailUser
-        {
+        public string RetailUser {
             get;
             set;
         }
         /// <summary>
         /// 
         /// </summary>
-        public string Mobile
-        {
+        public string Mobile {
             get;
             set;
         }
         /// <summary>
         /// 
         /// </summary>
-        public string Mail
-        {
+        public string Mail {
             get;
             set;
         }
         /// <summary>
         /// 
         /// </summary>
-        public string RealName
-        {
+        public string RealName {
             get;
             set;
         }
         /// <summary>
         /// 身份ID
         /// </summary>
-        public string IDCards
-        {
+        public string IdCards {
             get;
             set;
         }
         /// <summary>
         /// 
         /// </summary>
-        public DateTime RegTime
-        {
+        public DateTime RegTime {
             get;
             set;
         }
         /// <summary>
         /// 激活码
         /// </summary>
-        public string ActiveCode
-        {
+        public string ActiveCode {
             get;
             set;
         }
         /// <summary>
         /// 发送激活码时间
         /// </summary>
-        public DateTime SendActiveDate
-        {
+        public DateTime SendActiveDate {
             get;
             set;
         }
         /// <summary>
         /// 激活时间
         /// </summary>
-        public DateTime ActiveDate
-        {
+        public DateTime ActiveDate {
             get;
             set;
         }

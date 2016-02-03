@@ -119,7 +119,7 @@ namespace ZyGames.Framework.Game.Service
         /// <param name="aStat">接口访问是成功还是失败</param>
         public void Visitor(GameStruct.LogActionStat aStat)
         {
-            if (aStat == GameStruct.LogActionStat.Sucess)
+            if (aStat == GameStruct.LogActionStat.Success)
             {
                 this.SucCount++;
             }

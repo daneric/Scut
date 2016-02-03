@@ -26,13 +26,11 @@ using ZyGames.Framework.Game.Lang;
 using ZyGames.Framework.Game.Service;
 using ZyGames.Framework.RPC.Sockets;
 
-namespace ZyGames.Framework.Game.Contract.Action
-{
+namespace ZyGames.Framework.Game.Contract.Action {
     /// <summary>
     /// 
     /// </summary>
-    public enum ScriptType
-    {
+    public enum ScriptType {
         /// <summary>
         /// 
         /// </summary>
@@ -49,101 +47,90 @@ namespace ZyGames.Framework.Game.Contract.Action
     /// <summary>
     /// 
     /// </summary>
-    public class JsonScriptAction : ScriptAction
-    {
+    public class JsonScriptAction : ScriptAction {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="scriptType"></param>
-        /// <param name="aActionId"></param>
+        /// <param name="actionId"></param>
         /// <param name="actionGetter"></param>
         /// <param name="scriptScope"></param>
         /// <param name="ignoreAuthorize"></param>
-        public JsonScriptAction(ScriptType scriptType, int aActionId, ActionGetter actionGetter, object scriptScope, bool ignoreAuthorize)
-            : base(scriptType, aActionId, actionGetter, scriptScope, ignoreAuthorize)
-        {
+        public JsonScriptAction(ScriptType scriptType, int actionId, ActionGetter actionGetter, object scriptScope, bool ignoreAuthorize)
+            : base(scriptType, actionId, actionGetter, scriptScope, ignoreAuthorize) {
             EnableWebSocket = true;
         }
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        protected override string BuildJsonPack()
-        {
-            return _scriptScope.buildPacket(_urlParam, _actionResult);
+        protected override string BuildJsonPack() {
+            return scriptScope.buildPacket(urlParam, actionResult);
         }
     }
 
     /// <summary>
     /// 提供脚本支持
     /// </summary>
-    public class ScriptAction : AuthorizeAction
-    {
+    public class ScriptAction : AuthorizeAction {
         /// <summary>
         /// The _script scope.
         /// </summary>
-        protected readonly dynamic _scriptScope;
-        private readonly bool _ignoreAuthorize;
+        protected readonly dynamic scriptScope;
+        private readonly bool ignoreAuthorize;
         /// <summary>
         /// The _url parameter.
         /// </summary>
-        protected dynamic _urlParam;
+        protected dynamic urlParam;
         /// <summary>
         /// The _action result.
         /// </summary>
-        protected dynamic _actionResult;
-        private ScriptType _scriptType;
+        protected dynamic actionResult;
+        private ScriptType scriptType;
 
         /// <summary>
         /// /
         /// </summary>
         /// <param name="scriptType"></param>
-        /// <param name="aActionId"></param>
+        /// <param name="actionId"></param>
         /// <param name="actionGetter"></param>
         /// <param name="scriptScope"></param>
         /// <param name="ignoreAuthorize">忽略授权</param>
-        public ScriptAction(ScriptType scriptType, int aActionId, ActionGetter actionGetter, object scriptScope, bool ignoreAuthorize)
-            : base(aActionId, actionGetter)
-        {
-            _scriptType = scriptType;
-            _scriptScope = scriptScope;
-            _ignoreAuthorize = ignoreAuthorize;
+        public ScriptAction(ScriptType scriptType, object actionId, ActionGetter actionGetter, object scriptScope, bool ignoreAuthorize)
+            : base(actionId, actionGetter) {
+            this.scriptType = scriptType;
+            this.scriptScope = scriptScope;
+            this.ignoreAuthorize = ignoreAuthorize;
         }
         /// <summary>
         /// 子类实现
         /// </summary>
-        protected override void InitChildAction()
-        {
+        protected override void InitChildAction() {
         }
         /// <summary>
         /// 接收用户请求的参数，并根据相应类进行检测
         /// </summary>
         /// <returns></returns>
-        public override bool GetUrlElement()
-        {
-            _urlParam = _scriptScope.getUrlElement(actionGetter, this);
-            return _urlParam != null && _urlParam.Result ? true : false;
+        public override bool GetUrlElement() {
+            urlParam = scriptScope.getUrlElement(actionGetter, this);
+            return urlParam != null && urlParam.Result ? true : false;
         }
         /// <summary>
         /// 子类实现Action处理
         /// </summary>
         /// <returns></returns>
-        public override bool TakeAction()
-        {
-            _actionResult = _scriptScope.takeAction(_urlParam, this);
-            return _actionResult != null && _actionResult.Result ? true : false;
+        public override bool TakeAction() {
+            actionResult = scriptScope.takeAction(urlParam, this);
+            return actionResult != null && actionResult.Result ? true : false;
         }
         /// <summary>
         /// 创建返回协议内容输出栈
         /// </summary>
-        public override void BuildPacket()
-        {
-            bool result = _scriptScope.buildPacket(dataStruct, _urlParam, _actionResult);
-            if (!result)
-            {
+        public override void BuildPacket() {
+            bool result = scriptScope.buildPacket(dataStruct, urlParam, actionResult);
+            if (!result) {
                 ErrorCode = Language.Instance.ErrorCode;
-                if (IsRealse)
-                {
+                if (IsRelease) {
                     ErrorInfo = Language.Instance.ServerBusy;
                 }
             }
@@ -152,9 +139,8 @@ namespace ZyGames.Framework.Game.Contract.Action
         /// 不检查的ActionID
         /// </summary>
         /// <value><c>true</c> if ignore action identifier; otherwise, <c>false</c>.</value>
-        protected override bool IgnoreActionId
-        {
-            get { return _ignoreAuthorize; }
+        protected override bool IgnoreActionId {
+            get { return ignoreAuthorize; }
         }
     }
 }

@@ -763,7 +763,6 @@ namespace ZyGames.Framework.Cache.Generic
         /// <param name="isChange">更新的模式：是否仅更新有发生isChange的实例</param>
         public static void UpdateNotify(bool isChange)
         {
-
             if (UpdateCallbackHandle != null)
             {
                 Delegate[] handleList = UpdateCallbackHandle.GetInvocationList();

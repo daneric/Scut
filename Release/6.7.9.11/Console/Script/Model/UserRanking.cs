@@ -27,80 +27,54 @@ using ZyGames.Framework.Event;
 using ZyGames.Framework.Model;
 using ZyGames.Framework.Cache.Generic;
 
-namespace GameServer.Model
-{
+namespace GameServer.Model {
     /// <summary>
     /// user ranking
     /// </summary>
     [Serializable, ProtoContract]
     [EntityTable(CacheType.Entity, "ConnData")]
-    public class UserRanking : ShareEntity
-    {
+    public class UserRanking : ShareEntity {
         public UserRanking()
-            : base(false)
-        {
+            : base(false) {
             CreateDate = DateTime.Now;
             Items = new CacheList<EquiAttrInfo>();
         }
 
         [ProtoMember(1)]
         [EntityField(true)]
-        public int UserID
-        {
-            get;
-            set;
-        }
+        public int UserId { get; set; }
 
         [ProtoMember(2)]
         [EntityField]
-        public string UserName
-        {
-            get;
-            set;
-        }
+        public string UserName { get; set; }
 
         [ProtoMember(3)]
         [EntityField]
-        public int Score
-        {
-            get;
-            set;
-        }
+        public int Score { get; set; }
 
         [ProtoMember(4)]
         [EntityField]
-        public DateTime CreateDate
-        {
-            get;
-            set;
-        }
+        public DateTime CreateDate { get; set; }
 
         [ProtoMember(100)]
         [EntityField]
         public CacheList<EquiAttrInfo> Items { get; set; }
 
-        protected override int GetIdentityId()
-        {
-            return UserID;
+        protected override int GetIdentityId() {
+            return UserId;
         }
     }
 
     [Serializable, ProtoContract]
-    public class EquiAttrInfo : EntityChangeEvent
-    {
+    public class EquiAttrInfo : EntityChangeEvent {
         public EquiAttrInfo()
-            : base(false)
-        {
+            : base(false) {
         }
 
         /// <summary>
         /// 灞炴€?
         /// </summary>
         [ProtoMember(1)]
-        public int AttrType
-        {
-            get;
-            set;
-        }
+        public int AttrType { get; set; }
     }
 }

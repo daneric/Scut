@@ -13,7 +13,7 @@ furnished to do so, subject to the following conditions:
 The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+THE SOFTWARE IS PROVIdED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
@@ -26,62 +26,53 @@ using ZyGames.Framework.Common.Log;
 using ZyGames.Framework.Game.Pay;
 using ZyGames.Framework.Game.Service;
 
-namespace ZyGames.Framework.Game.Contract.Action
-{
-	/// <summary>
-	/// Sdk91 pay action.
-	/// </summary>
-    public class Sdk91PayAction : BaseStruct
-    {
-        private string OrderID = string.Empty;
-        private int gameID = 0;
-        private int serviceID = 0;
+namespace ZyGames.Framework.Game.Contract.Action {
+    /// <summary>
+    /// Sdk91 pay action.
+    /// </summary>
+    public class Sdk91PayAction : BaseStruct {
+        private string orderId = string.Empty;
+        private int gameId = 0;
+        private int serverId = 0;
         private string passportId = string.Empty;
-        private string servicename = string.Empty;
-        private string _RetailID = "0000";
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ZyGames.Framework.Game.Contract.Action.Sdk91PayAction"/> class.
-		/// </summary>
-		/// <param name="aActionId">A action identifier.</param>
-		/// <param name="httpGet">Http get.</param>
-        public Sdk91PayAction(short aActionId, ActionGetter httpGet)
-            : base(aActionId, httpGet)
-        {
+        private string serverName = string.Empty;
+        private string retailId = "0000";
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ZyGames.Framework.Game.Contract.Action.Sdk91PayAction"/> class.
+        /// </summary>
+        /// <param name="actionId">Action identifier.</param>
+        /// <param name="httpGet">Http get.</param>
+        public Sdk91PayAction(object actionId, ActionGetter httpGet)
+            : base(actionId, httpGet) {
         }
-		/// <summary>
-		/// 创建返回协议内容输出栈
-		/// </summary>
-        public override void BuildPacket()
-        {
+        /// <summary>
+        /// 创建返回协议内容输出栈
+        /// </summary>
+        public override void BuildPacket() {
         }
-		/// <summary>
-		/// 接收用户请求的参数，并根据相应类进行检测
-		/// </summary>
-		/// <returns></returns>
-        public override bool GetUrlElement()
-        {
+        /// <summary>
+        /// 接收用户请求的参数，并根据相应类进行检测
+        /// </summary>
+        /// <returns></returns>
+        public override bool GetUrlElement() {
             TraceLog.ReleaseWriteFatal("url");
-            if (actionGetter.GetString("OrderID", ref OrderID)
-                && actionGetter.GetInt("gameID", ref gameID)
-                && actionGetter.GetInt("Server", ref serviceID)
-                && actionGetter.GetString("ServiceName", ref servicename)
-                && actionGetter.GetString("PassportID", ref passportId))
-            {
-                actionGetter.GetString("RetailID", ref _RetailID);
+            if (actionGetter.GetString("OrderId", ref orderId) && 
+                actionGetter.GetInt("GameId", ref gameId) && 
+                actionGetter.GetInt("ServerId", ref serverId) && 
+                actionGetter.GetString("ServerName", ref serverName) && 
+                actionGetter.GetString("PassportId", ref passportId)) {
+                actionGetter.GetString("RetailId", ref retailId);
                 return true;
             }
             return false;
         }
-		/// <summary>
-		/// 子类实现Action处理
-		/// </summary>
-		/// <returns></returns>
-        public override bool TakeAction()
-        {
-            SaveLog(string.Format("91SKD充值>>Order:{0},Pid:{1},servicename:{2}", OrderID, passportId, servicename));
-            //PaymentService.Get91Payment(gameID, serviceID, passportId, servicename, OrderID);
-
-            PayManager.get91PayInfo(gameID, serviceID, passportId, servicename, OrderID, _RetailID);
+        /// <summary>
+        /// 子类实现Action处理
+        /// </summary>
+        /// <returns></returns>
+        public override bool TakeAction() {
+            SaveLog(string.Format("91SKD充值>>Order:{0},Pid:{1},ServerName:{2}", orderId, passportId, serverName));
+            PayManager.Get91PayInfo(gameId, serverId, passportId, serverName, orderId, retailId);
             return true;
         }
     }

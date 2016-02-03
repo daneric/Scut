@@ -27,55 +27,46 @@ using ZyGames.Framework.Common.Log;
 using ZyGames.Framework.Common.Security;
 using ZyGames.Framework.Game.Runtime;
 
-namespace ZyGames.Framework.Game.Sns
-{
+namespace ZyGames.Framework.Game.Sns {
     /// <summary>
     /// 36you官网登录0000
     /// </summary>
-    public class Login36you : AbstractLogin
-    {
+    public class Login36you : AbstractLogin {
         /// <summary>
         /// Initializes a new instance of the <see cref="ZyGames.Framework.Game.Sns.Login36you"/> class.
         /// </summary>
-        /// <param name="passportID">Passport I.</param>
+        /// <param name="passportId">Passport I.</param>
         /// <param name="password">Password.</param>
-        /// <param name="deviceID">Device I.</param>
-        public Login36you(string passportID, string password, string deviceID)
-        {
-            this.PassportID = passportID;
-            this.DeviceID = deviceID;
+        /// <param name="deviceId">Device I.</param>
+        public Login36you(string passportId, string password, string deviceId) {
+            PassportId = passportId;
             Password = password;
+            DeviceId = deviceId;
         }
         /// <summary>
         /// 注册通行证
         /// </summary>
         /// <returns></returns>
-        public override string GetRegPassport()
-        {
-            string[] userList = SnsManager.GetRegPassport(DeviceID, false);
-            if (userList.Length == 2)
-            {
-                PassportID = userList[0];
+        public override string GetRegPassport() {
+            string[] userList = SnsManager.GetRegPassport(DeviceId, false);
+            if (userList.Length == 2) {
+                PassportId = userList[0];
                 Password = userList[1];
             }
-            return PassportID;
+            return PassportId;
         }
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public override bool CheckLogin()
-        {
+        public override bool CheckLogin() {
             //快速登录
             RegType regType;
-            UserID = SnsManager.LoginByDevice(PassportID, Password, DeviceID, out regType).ToString();
-
-            if (!string.IsNullOrEmpty(UserID) && UserID != "0")
-            {
-                UserType = (int) regType;
-                if (string.IsNullOrEmpty(SessionID))
-                {
-                    SessionID = GetSessionId();
+            UserId = SnsManager.LoginByDevice(PassportId, Password, DeviceId, out regType).ToString();
+            if (!string.IsNullOrEmpty(UserId) && UserId != "0") {
+                UserType = (int)regType;
+                if (string.IsNullOrEmpty(SessionId)) {
+                    SessionId = GetSessionId();
                 }
                 return true;
             }

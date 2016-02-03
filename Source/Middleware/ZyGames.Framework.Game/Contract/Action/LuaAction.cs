@@ -25,50 +25,40 @@ THE SOFTWARE.
 using ZyGames.Framework.Game.Lang;
 using ZyGames.Framework.Game.Service;
 
-namespace ZyGames.Framework.Game.Contract.Action
-{
-    class JsonLuaAction : LuaAction
-    {
-        public JsonLuaAction(int actionId, ActionGetter actionGetter, object scriptScope, bool ignoreAuthorize)
-            : base(actionId, actionGetter, scriptScope, ignoreAuthorize)
-        {
+namespace ZyGames.Framework.Game.Contract.Action {
+    class JsonLuaAction : LuaAction {
+        public JsonLuaAction(object actionId, ActionGetter actionGetter, object scriptScope, bool ignoreAuthorize)
+            : base(actionId, actionGetter, scriptScope, ignoreAuthorize) {
             EnableWebSocket = true;
         }
 
-        protected override string BuildJsonPack()
-        {
-            return _scriptScope["buildPacket"].Call(_scriptScope, _urlParam, _actionResult)[0];
+        protected override string BuildJsonPack() {
+            return scriptScope["buildPacket"].Call(scriptScope, urlParam, actionResult)[0];
         }
     }
-    class LuaAction : ScriptAction
-    {
-        public LuaAction(int actionId, ActionGetter actionGetter, object scriptScope, bool ignoreAuthorize)
-            : base(ScriptType.Lua, actionId, actionGetter, scriptScope, ignoreAuthorize)
-        {
+
+    class LuaAction : ScriptAction {
+        public LuaAction(object actionId, ActionGetter actionGetter, object scriptScope, bool ignoreAuthorize)
+            : base(ScriptType.Lua, actionId, actionGetter, scriptScope, ignoreAuthorize) {
             //ScriptEngines.LuaRegister(actionGetter);
         }
 
-        public override bool GetUrlElement()
-        {
-            var func = _scriptScope["getUrlElement"];
-            _urlParam = func.Call(_scriptScope, actionGetter)[0];
-            return _urlParam != null && _urlParam["Result"] ? true : false;
+        public override bool GetUrlElement() {
+            var func = scriptScope["getUrlElement"];
+            urlParam = func.Call(scriptScope, actionGetter)[0];
+            return urlParam != null && urlParam["Result"] ? true : false;
         }
 
-        public override bool DoAction()
-        {
-            _actionResult = _scriptScope["takeAction"].Call(_scriptScope, _urlParam)[0];
-            return _actionResult != null && _actionResult["Result"] ? true : false;
+        public override bool DoAction() {
+            actionResult = scriptScope["takeAction"].Call(scriptScope, urlParam)[0];
+            return actionResult != null && actionResult["Result"] ? true : false;
         }
 
-        public override void BuildPacket()
-        {
-            bool result = _scriptScope["buildPacket"].Call(_scriptScope, dataStruct, _urlParam, _actionResult)[0];
-            if (!result)
-            {
+        public override void BuildPacket() {
+            bool result = scriptScope["buildPacket"].Call(scriptScope, dataStruct, urlParam, actionResult)[0];
+            if (!result) {
                 ErrorCode = Language.Instance.ErrorCode;
-                if (!IsRealse)
-                {
+                if (!IsRelease) {
                     ErrorInfo = Language.Instance.ServerBusy;
                 }
             }

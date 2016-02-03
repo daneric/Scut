@@ -40,7 +40,7 @@ namespace ZyGames.Framework.Game.Contract
         public SessionUser()
         {
             OnlineInterval = new TimeSpan(0, 1, 0);
-            RefleshOnlineDate();
+            RefreshOnlineDate();
         }
 
         /// <summary>
@@ -115,7 +115,7 @@ namespace ZyGames.Framework.Game.Contract
         /// <summary>
         /// 
         /// </summary>
-        public void RefleshOnlineDate()
+        public void RefreshOnlineDate()
         {
             OnlineDate = DateTime.Now;
         }

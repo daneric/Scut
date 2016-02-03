@@ -31,106 +31,98 @@ using ZyGames.Framework.Game.Lang;
 using ZyGames.Framework.Game.Pay;
 using ZyGames.Framework.Game.Service;
 
-namespace ZyGames.Framework.Game.Contract.Action
-{
+namespace ZyGames.Framework.Game.Contract.Action {
     /// <summary>
     /// 充值通用接口
     /// </summary>
-    public class PayNormalAction : BaseStruct
-    {
+    public class PayNormalAction : BaseStruct {
         /// <summary>
-        /// The _amount.
+        /// The amount.
         /// </summary>
-        protected int _amount;
+        protected int amount;
         /// <summary>
-        /// The _game I.
+        /// The game Id.
         /// </summary>
-        protected int _gameID;
+        protected int gameId;
         /// <summary>
-        /// The _server I.
+        /// The name of the game.
         /// </summary>
-        protected int _serverID;
+        protected string gameName;
         /// <summary>
-        /// The name of the _server.
+        /// The server Id.
         /// </summary>
-        protected string _serverName;
+        protected int serverId;
         /// <summary>
-        /// The _order no.
+        /// The name of the server.
         /// </summary>
-        protected string _orderNo;
+        protected string serverName;
         /// <summary>
-        /// The _passport I.
+        /// The order no.
         /// </summary>
-        protected string _passportID;
+        protected string orderNo;
         /// <summary>
-        /// The _currency.
+        /// The passport Id.
         /// </summary>
-        protected string _currency;
+        protected string passportId;
         /// <summary>
-        /// The _retail I.
+        /// The currency.
         /// </summary>
-        protected string _retailID;
+        protected string currency;
         /// <summary>
-        /// The _device I.
+        /// The retail Id.
         /// </summary>
-        protected string _deviceID;
+        protected string retailId;
         /// <summary>
-        /// The _product I.
+        /// The device Id.
         /// </summary>
-        protected string _productID;
+        protected string deviceId;
         /// <summary>
-        /// The type of the _pay.
+        /// The product Id.
         /// </summary>
-        protected string _payType;
+        protected string productId;
         /// <summary>
-        /// The name of the _game.
+        /// The type of the pay.
         /// </summary>
-        protected string _gameName;
+        protected string payType;
         /// <summary>
-        /// The _pay status.
+        /// The pay status.
         /// </summary>
-        protected int _payStatus;
+        protected int payStatus;
         /// <summary>
         /// Initializes a new instance of the <see cref="ZyGames.Framework.Game.Contract.Action.PayNormalAction"/> class.
         /// </summary>
-        /// <param name="aActionId">A action identifier.</param>
+        /// <param name="actionId">A action identifier.</param>
         /// <param name="httpGet">Http get.</param>
-        public PayNormalAction(short aActionId, ActionGetter httpGet)
-            : base(aActionId, httpGet)
-        {
+        public PayNormalAction(object actionId, ActionGetter httpGet)
+            : base(actionId, httpGet) {
         }
         /// <summary>
         /// 创建返回协议内容输出栈
         /// </summary>
-        public override void BuildPacket()
-        {
-            PushIntoStack(_payStatus);
+        public override void BuildPacket() {
+            PushIntoStack(payStatus);
         }
         /// <summary>
         /// 接收用户请求的参数，并根据相应类进行检测
         /// </summary>
         /// <returns></returns>
-        public override bool GetUrlElement()
-        {
-            if (actionGetter.GetInt("GameID", ref _gameID)
-                && actionGetter.GetInt("ServerID", ref _serverID)
-                && actionGetter.GetString("ServerName", ref _serverName)
-                && actionGetter.GetString("OrderNo", ref _orderNo)
-                && actionGetter.GetString("PassportID", ref _passportID)
-                && actionGetter.GetString("PayType", ref _payType))
-            {
-                if (!actionGetter.GetString("Currency", ref _currency))
-                {
-                    _currency = "CNY";
+        public override bool GetUrlElement() {
+            if (actionGetter.GetInt("GameId", ref gameId) && 
+                actionGetter.GetInt("ServerId", ref serverId) &&
+                actionGetter.GetString("ServerName", ref serverName) &&
+                actionGetter.GetString("OrderNo", ref orderNo) &&
+                actionGetter.GetString("PassportId", ref passportId) &&
+                actionGetter.GetString("PayType", ref payType)) {
+                if (!actionGetter.GetString("Currency", ref currency)) {
+                    currency = "CNY";
                 }
-                if (!actionGetter.GetString("RetailID", ref _retailID))
-                {
-                    _retailID = _payType;
+                if (!actionGetter.GetString("RetailId", ref retailId)) {
+                    retailId = payType;
                 }
-                actionGetter.GetString("DeviceID", ref _deviceID);
-                actionGetter.GetString("ProductID", ref _productID);
-                actionGetter.GetInt("Amount", ref _amount);
-                actionGetter.GetString("GameName", ref _gameName);
+                actionGetter.GetString("DeviceId", ref deviceId);
+                actionGetter.GetString("ProductId", ref productId);
+                actionGetter.GetInt("Amount", ref amount);
+                actionGetter.GetString("GameName", ref gameName);
                 return true;
             }
             return false;
@@ -139,66 +131,57 @@ namespace ZyGames.Framework.Game.Contract.Action
         /// 子类实现Action处理
         /// </summary>
         /// <returns></returns>
-        public override bool TakeAction()
-        {
+        public override bool TakeAction() {
             OrderInfo orderInfo = new OrderInfo();
-            orderInfo.OrderNO = _orderNo;
-            orderInfo.MerchandiseName = _productID;
-            orderInfo.Currency = _currency;
-            orderInfo.Amount = _amount;
-            orderInfo.PassportID = _passportID;
-            orderInfo.RetailID = _retailID;
+            orderInfo.OrderNo = orderNo;
+            orderInfo.MerchandiseName = productId;
+            orderInfo.Currency = currency;
+            orderInfo.Amount = amount;
+            orderInfo.PassportId = passportId;
+            orderInfo.RetailId = retailId;
             orderInfo.PayStatus = 1;
-            orderInfo.GameID = _gameID;
-            orderInfo.ServerID = _serverID;
-            orderInfo.GameName = _gameName;
-            orderInfo.ServerName = _serverName;
-            orderInfo.GameCoins = (_amount * 10).ToInt();
+            orderInfo.GameId = gameId;
+            orderInfo.ServerId = serverId;
+            orderInfo.GameName = gameName;
+            orderInfo.ServerName = serverName;
+            orderInfo.GameCoins = (amount * 10).ToInt();
             orderInfo.SendState = 1;
-            orderInfo.PayType = _payType;
+            orderInfo.PayType = payType;
             orderInfo.Signature = "000000";
-            orderInfo.DeviceID = _deviceID;
+            orderInfo.DeviceId = deviceId;
 
-            if (PayManager.AddOrder(orderInfo))
-            {
+            if (PayManager.AddOrder(orderInfo)) {
                 DoSuccess(orderInfo);
-                _payStatus = orderInfo.PayStatus;
-                TraceLog.ReleaseWriteFatal(string.Format("PayNormal Order:{0},pid:{1} successfully!", _orderNo, _passportID));
+                payStatus = orderInfo.PayStatus;
+                TraceLog.ReleaseWriteFatal(string.Format("PayNormal Order:{0},pid:{1} successfully!", orderNo, passportId));
                 return true;
             }
             ErrorCode = Language.Instance.ErrorCode;
             ErrorInfo = Language.Instance.AppStorePayError;
-            TraceLog.ReleaseWriteFatal(string.Format("PayNormal Order:{0},pid:{1} faild!", _orderNo, _passportID));
+            TraceLog.ReleaseWriteFatal(string.Format("PayNormal Order:{0},pid:{1} faild!", orderNo, passportId));
             return false;
         }
 
-        private void DoSuccess(OrderInfo orderInfo)
-        {
+        private void DoSuccess(OrderInfo orderInfo) {
             //移动MM SDK
             Check10086Payment(orderInfo);
         }
 
-        private void Check10086Payment(OrderInfo orderInfo)
-        {
-            try
-            {
+        private void Check10086Payment(OrderInfo orderInfo) {
+            try {
                 string url = "http://ospd.mmarket.com:8089/trust";
                 string appId = "";
                 string version = "1.0.0";
                 int orderType = 1;
                 GameChannel gameChannel = ZyGameBaseConfigManager.GameSetting.GetChannelSetting(ChannelType.channel10086);
-                if (gameChannel != null)
-                {
+                if (gameChannel != null) {
                     url = gameChannel.Url;
                     version = gameChannel.Version;
                     orderType = gameChannel.CType.ToInt();
                     GameSdkSetting setting = gameChannel.GetSetting(orderInfo.PayType);
-                    if (setting != null)
-                    {
+                    if (setting != null) {
                         appId = setting.AppId;
-                    }
-                    else
-                    {
+                    } else {
                         return;
                     }
                 }
@@ -208,40 +191,34 @@ namespace ZyGames.Framework.Game.Contract.Action
                 paramData.AppendFormat("<MsgType>{0}</MsgType>", "Trusted2ServQueryReq");
                 paramData.AppendFormat("<Version>{0}</Version>", version);
                 paramData.AppendFormat("<AppID>{0}</AppID>", appId);
-                paramData.AppendFormat("<OrderID>{0}</OrderID>", orderInfo.OrderNO);
+                paramData.AppendFormat("<OrderID>{0}</OrderID>", orderInfo.OrderNo);
                 paramData.AppendFormat("<OrderType>{0}</OrderType>", orderType);
                 paramData.AppendFormat("</Trusted2ServQueryReq>");
 
                 var stream = HttpUtils.Post(url, paramData.ToString(), Encoding.UTF8, HttpUtils.XmlContentType);
                 XmlDocument doc = new XmlDocument();
                 doc.Load(stream);
-                TraceLog.ReleaseWriteFatal("10068 order:{0} response:{1}", orderInfo.OrderNO, doc.InnerXml);
+                TraceLog.ReleaseWriteFatal("10068 order:{0} response:{1}", orderInfo.OrderNo, doc.InnerXml);
                 var returnCode = doc.SelectSingleNode("Trusted2ServQueryResp/ReturnCode");
-                if (returnCode != null && !string.IsNullOrEmpty(returnCode.InnerText))
-                {
+                if (returnCode != null && !string.IsNullOrEmpty(returnCode.InnerText)) {
                     int code = returnCode.InnerText.ToInt();
-                    if (code == 0)
-                    {
+                    if (code == 0) {
                         string orderNo = "";
                         var orderIDNode = doc.SelectSingleNode("Trusted2ServQueryResp/OrderID");
-                        if (orderIDNode != null)
-                        {
+                        if (orderIDNode != null) {
                             orderNo = orderIDNode.InnerText;
                         }
                         var priceNode = doc.SelectSingleNode("Trusted2ServQueryResp/TotalPrice");
-                        if (priceNode != null)
-                        {
+                        if (priceNode != null) {
                             decimal amount = priceNode.InnerText.ToDecimal();
                             orderInfo.Amount = amount;
                             orderInfo.GameCoins = (int)amount * 10;
                         }
                         PayManager.PaySuccess(orderNo, orderInfo);
                     }
-                    TraceLog.ReleaseWriteFatal("10086 payment order:{0} fail code:{1}", orderInfo.OrderNO, code);
+                    TraceLog.ReleaseWriteFatal("10086 payment order:{0} fail code:{1}", orderInfo.OrderNo, code);
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 TraceLog.WriteError("10086 payment error:", ex);
             }
         }

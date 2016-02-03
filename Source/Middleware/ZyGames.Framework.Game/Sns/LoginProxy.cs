@@ -28,25 +28,21 @@ using ZyGames.Framework.Common.Reflect;
 using ZyGames.Framework.Game.Configuration;
 using ZyGames.Framework.Game.Service;
 
-namespace ZyGames.Framework.Game.Sns
-{
+namespace ZyGames.Framework.Game.Sns {
     /// <summary>
     /// 登录代理
     /// </summary>
-    public class LoginProxy
-    {
-        private const string DefaultArgs = "Pid,Pwd,DeviceID";
+    public class LoginProxy {
+        private const string DefaultArgs = "PassportId,Password,DeviceId";
 
-        private LoginProxy()
-        {
+        private LoginProxy() {
         }
 
         /// <summary>
         /// Gets the login.
         /// </summary>
         /// <returns>The login.</returns>
-        public static ILogin GetLogin(ActionGetter httpGet, string retaiId)
-        {
+        public static ILogin GetLogin(ActionGetter httpGet, string retaiId) {
             return GetLogin(retaiId, httpGet);
         }
 
@@ -56,36 +52,28 @@ namespace ZyGames.Framework.Game.Sns
         /// <param name="retaiId"></param>
         /// <param name="obj">sdk json object of request or ActionGetter object</param>
         /// <returns></returns>
-        public static ILogin GetLogin(string retaiId, object obj)
-        {
-            if (string.IsNullOrEmpty(retaiId))
-            {
+        public static ILogin GetLogin(string retaiId, object obj) {
+            if (string.IsNullOrEmpty(retaiId)) {
                 return null;
             }
             object[] args = new object[0];
             string typeName = string.Format("{0}.Sns.Login36you,{0}", "ZyGames.Framework.Game");
 
             bool hasRetail = false;
-            if (ZyGameBaseConfigManager.GameSetting.HasSetting)
-            {
+            if (ZyGameBaseConfigManager.GameSetting.HasSetting) {
                 var loginSetting = ZyGameBaseConfigManager.GameSetting.GetLoginSetting(retaiId);
-                if (loginSetting != null)
-                {
+                if (loginSetting != null) {
                     typeName = loginSetting.TypeName.Contains(",")
                         ? loginSetting.TypeName
                         : string.Format("{0}.Sns.{1},{0}", "ZyGames.Framework.Game", loginSetting.TypeName);
                     args = GetArgs(loginSetting.TypeArgs, obj);
                     hasRetail = true;
                 }
-            }
-            else
-            {
+            } else {
                 var loginSection = ZyGameBaseConfigManager.GetLogin();
-                if (loginSection != null)
-                {
+                if (loginSection != null) {
                     var retail = loginSection.RetailList[retaiId];
-                    if (retail != null)
-                    {
+                    if (retail != null) {
                         typeName = retail.TypeName.Contains(",")
                             ? retail.TypeName
                             : string.Format("{0}.Sns.{1},{0}", "ZyGames.Framework.Game", retail.TypeName);
@@ -94,33 +82,26 @@ namespace ZyGames.Framework.Game.Sns
                     }
                 }
             }
-            if (!hasRetail)
-            {
+            if (!hasRetail) {
                 args = GetArgs(DefaultArgs, obj);
             }
 
             var type = Type.GetType(typeName, false, true);
-            if (type == null)
-            {
+            if (type == null) {
                 return null;
             }
             return type.CreateInstance<ILogin>(args);
         }
 
-        private static object[] GetArgs(string argsStr, object obj)
-        {
+        private static object[] GetArgs(string argsStr, object obj) {
             var args = new List<object>();
             string[] paramList = argsStr.Split(',');
             object paramVal = null;
-            foreach (string param in paramList)
-            {
+            foreach (string param in paramList) {
                 var getter = obj as ActionGetter;
-                if (getter != null)
-                {
+                if (getter != null) {
                     paramVal = getter.GetString(param);
-                }
-                else if (obj != null)
-                {
+                } else if (obj != null) {
                     paramVal = ObjectAccessor.Create(obj, true)[param];
                 }
                 args.Add(paramVal);

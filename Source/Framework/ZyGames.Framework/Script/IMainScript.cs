@@ -30,12 +30,12 @@ namespace ZyGames.Framework.Script
     public interface IMainScript
     {
         /// <summary>
-        /// Main
+        /// Start
         /// </summary>
         void Start(string[] args);
 
         /// <summary>
-        /// 
+        /// ProcessRequest
         /// </summary>
         byte[] ProcessRequest(object package, object param);
 
@@ -45,8 +45,8 @@ namespace ZyGames.Framework.Script
         void Stop();
 
         /// <summary>
-        /// Main
+        /// Restart
         /// </summary>
-        void ReStart();
+        void Restart();
     }
 }

@@ -30,15 +30,12 @@ using ZyGames.Framework.Common.Log;
 using ZyGames.Framework.Common.Serialization;
 using ZyGames.Framework.Game.Configuration;
 
-namespace ZyGames.Framework.Game.Sns
-{
+namespace ZyGames.Framework.Game.Sns {
     /// <summary>
     /// 9游0036
     /// </summary>
-    public class LoginUC : AbstractLogin
-    {
-        enum MobileType
-        {
+    public class LoginUC : AbstractLogin {
+        enum MobileType {
             //Win32
             ptWin32,
             //Ipod
@@ -58,43 +55,42 @@ namespace ZyGames.Framework.Game.Sns
             //未知
             ptUnknow
         };
-		///
-        public class UcConfig
-        {
-			/// <summary>
-			/// Gets or sets the cp identifier.
-			/// </summary>
-			/// <value>The cp identifier.</value>
+        ///
+        public class UcConfig {
+            /// <summary>
+            /// Gets or sets the cp identifier.
+            /// </summary>
+            /// <value>The cp identifier.</value>
             public string CpId { get; set; }
-			/// <summary>
-			/// Gets or sets the game identifier.
-			/// </summary>
-			/// <value>The game identifier.</value>
+            /// <summary>
+            /// Gets or sets the game identifier.
+            /// </summary>
+            /// <value>The game identifier.</value>
             public string GameId { get; set; }
-			/// <summary>
-			/// Gets or sets the server identifier.
-			/// </summary>
-			/// <value>The server identifier.</value>
+            /// <summary>
+            /// Gets or sets the server identifier.
+            /// </summary>
+            /// <value>The server identifier.</value>
             public string ServerId { get; set; }
-			/// <summary>
-			/// Gets or sets the channel identifier.
-			/// </summary>
-			/// <value>The channel identifier.</value>
+            /// <summary>
+            /// Gets or sets the channel identifier.
+            /// </summary>
+            /// <value>The channel identifier.</value>
             public string ChannelId { get; set; }
-			/// <summary>
-			/// Gets or sets the API key.
-			/// </summary>
-			/// <value>The API key.</value>
+            /// <summary>
+            /// Gets or sets the API key.
+            /// </summary>
+            /// <value>The API key.</value>
             public string ApiKey { get; set; }
-			/// <summary>
-			/// Gets or sets the post URL.
-			/// </summary>
-			/// <value>The post URL.</value>
+            /// <summary>
+            /// Gets or sets the post URL.
+            /// </summary>
+            /// <value>The post URL.</value>
             public string PostUrl { get; set; }
-			/// <summary>
-			/// Gets or sets the service.
-			/// </summary>
-			/// <value>The service.</value>
+            /// <summary>
+            /// Gets or sets the service.
+            /// </summary>
+            /// <value>The service.</value>
             public string Service { get; set; }
         }
 
@@ -102,58 +98,46 @@ namespace ZyGames.Framework.Game.Sns
         //正式 681/66943/1091/2 865e9567eddc2e883dc6c863afd5028a isDebug=0 sdk.g.uc.cn/ss 
         //ios(越狱) 测试 695/64677/1008/2 fbd97e6b93d72997eea9e58fdbc01950 isDebug=1 sdk.test2.g.uc.cn 
         //正式 681/75383/1090/2 865e9567eddc2e883dc6c863afd5028a isDebug=0 sdk.g.uc.cn/ss 
-        private string _retailID = string.Empty;
-        private string _retailUser = string.Empty;
-        private string _sessionID = string.Empty;
-        private MobileType _mobileType;
+        private string retailId = string.Empty;
+        private string retailUser = string.Empty;
+        private string sessionId = string.Empty;
+        private MobileType mobileType;
         private const string encrypt = "md5";
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ZyGames.Framework.Game.Sns.LoginUC"/> class.
-		/// </summary>
-		/// <param name="retailID">Retail I.</param>
-		/// <param name="sid">Sid.</param>
-		/// <param name="mobileType">Mobile type.</param>
-        public LoginUC(string retailID, string sid, string mobileType)
-        {
-            this._retailID = retailID;
-            this._sessionID = sid;
-            this._mobileType = mobileType.ToEnum<MobileType>();
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ZyGames.Framework.Game.Sns.LoginUC"/> class.
+        /// </summary>
+        /// <param name="retailId">Retail id.</param>
+        /// <param name="sessionId">Session id.</param>
+        /// <param name="mobileType">Mobile type.</param>
+        public LoginUC(string retailId, string sessionId, string mobileType) {
+            this.retailId = retailId;
+            this.sessionId = sessionId;
+            this.mobileType = mobileType.ToEnum<MobileType>();
         }
-		/// <summary>
-		/// 注册通行证
-		/// </summary>
-		/// <returns></returns>
-        public override string GetRegPassport()
-        {
-            return this.PassportID;
-        }
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <returns></returns>
-        public override bool CheckLogin()
-        {
-            if (string.IsNullOrEmpty(_sessionID))
-            {
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override bool CheckLogin() {
+            if (string.IsNullOrEmpty(sessionId)) {
                 return false;
             }
-            string key = _mobileType == MobileType.ptAndroid ? "android" : "ios";
+            string key = mobileType == MobileType.ptAndroid ? "android" : "ios";
             GameChannel gameChannel = ZyGameBaseConfigManager.GameSetting.GetChannelSetting(ChannelType.channelUC);
-            if (gameChannel == null)
-            {
+            if (gameChannel == null) {
                 TraceLog.ReleaseWrite("The sdkChannel UC section is null.");
                 return false;
             }
             GameSdkSetting setting = gameChannel.GetSetting(key);
-            if (setting == null)
-            {
+            if (setting == null) {
                 TraceLog.ReleaseWrite("The sdkChannel UC section channelUC:{0} is null.", key);
                 return false;
             }
 
             string id = ((DateTime.Now - Convert.ToDateTime("1970-1-1")).TotalMilliseconds).ToString().Substring(0, 13);
-		    string signSrc = setting.AppId + "sid=" + _sessionID + setting.AppKey;
-            string sign = AMD5(signSrc);
+            string signSrc = setting.AppId + "sid=" + sessionId + setting.AppKey;
+            string sign = MD5(signSrc);
             StringBuilder sb = new StringBuilder();
             sb.Append("{");
             sb.Append("\"service\":\"").Append(gameChannel.Service).Append("\",");
@@ -164,32 +148,27 @@ namespace ZyGames.Framework.Game.Sns
             sb.Append("\"channelId\":\"").Append(gameChannel.ChannelId).Append("\",");
             sb.Append("\"serverId\":\"").Append(setting.ServerId).Append("\"},");
             sb.Append("\"data\":{");
-            sb.Append("\"sid\":\"").Append(_sessionID).Append("\"},");
+            sb.Append("\"sid\":\"").Append(sessionId).Append("\"},");
             sb.Append("\"encrypt\":\"").Append(encrypt).Append("\",");
             sb.Append("\"sign\":\"").Append(sign).Append("\"}");
 
             string result = httpPost(gameChannel.Url, sb.ToString(), Encoding.UTF8);
             UCInfo ucinfo = null;
-            try
-            {
+            try {
                 ucinfo = JsonUtils.Deserialize<UCInfo>(result);
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 new BaseLog().SaveLog(ex);
                 return false;
             }
-            if (ucinfo == null || ucinfo.state.code != "1")
-            {
-                TraceLog.ReleaseWrite("Danlesdk login fail:{0},request url:{1},param:{2},signsrc:{3}", result, gameChannel.Url, sb.ToString(), signSrc);
+            if (ucinfo == null || ucinfo.state.code != "1") {
+                TraceLog.ReleaseWrite("UC login fail:{0},request url:{1},param:{2},signsrc:{3}", result, gameChannel.Url, sb.ToString(), signSrc);
                 return false;
             }
 
-            _retailUser = ucinfo.data.ucid;
-
-            string[] arr = SnsManager.LoginByRetail(_retailID, _retailUser);
-            this.UserID = arr[0];
-            this.PassportID = arr[1];
+            retailUser = ucinfo.data.ucid;
+            string[] arr = SnsManager.LoginByRetail(retailId, retailUser);
+            UserId = arr[0];
+            PassportId = arr[1];
             return true;
         }
         /// <summary>
@@ -199,11 +178,9 @@ namespace ZyGames.Framework.Game.Sns
         /// <param name="urlStr">URL string.</param>
         /// <param name="postData">Post data.</param>
         /// <param name="encoding">Encoding.</param>
-        public string httpPost(String urlStr, String postData, Encoding encoding)
-        {
+        public string httpPost(String urlStr, String postData, Encoding encoding) {
             HttpWebResponse resp = null;
-            try
-            {
+            try {
                 Uri uri = new Uri(urlStr);
                 string postdata = postData;
 
@@ -228,15 +205,10 @@ namespace ZyGames.Framework.Game.Sns
                 sr.Close();
 
                 return str;
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 new BaseLog().SaveLog(ex);
-            }
-            finally
-            {
-                if (null != resp)
-                {
+            } finally {
+                if (null != resp) {
                     resp.Close();
                 }
             }
@@ -245,57 +217,54 @@ namespace ZyGames.Framework.Game.Sns
         }
     }
 
-	/// <summary>
-	/// UC info.
-	/// </summary>
-    public class UCInfo
-    {
-		/// <summary>
-		/// Gets or sets the identifier.
-		/// </summary>
-		/// <value>The identifier.</value>
+    /// <summary>
+    /// UC info.
+    /// </summary>
+    public class UCInfo {
+        /// <summary>
+        /// Gets or sets the identifier.
+        /// </summary>
+        /// <value>The identifier.</value>
         public string id { get; set; }
-		/// <summary>
-		/// Gets or sets the state.
-		/// </summary>
-		/// <value>The state.</value>
+        /// <summary>
+        /// Gets or sets the state.
+        /// </summary>
+        /// <value>The state.</value>
         public UCState state { get; set; }
-		/// <summary>
-		/// Gets or sets the data.
-		/// </summary>
-		/// <value>The data.</value>
+        /// <summary>
+        /// Gets or sets the data.
+        /// </summary>
+        /// <value>The data.</value>
         public UCdata data { get; set; }
     }
-	/// <summary>
-	/// UC state.
-	/// </summary>
-    public class UCState
-    {
-		/// <summary>
-		/// Gets or sets the code.
-		/// </summary>
-		/// <value>The code.</value>
+    /// <summary>
+    /// UC state.
+    /// </summary>
+    public class UCState {
+        /// <summary>
+        /// Gets or sets the code.
+        /// </summary>
+        /// <value>The code.</value>
         public string code { get; set; }
-		/// <summary>
-		/// Gets or sets the message.
-		/// </summary>
-		/// <value>The message.</value>
+        /// <summary>
+        /// Gets or sets the message.
+        /// </summary>
+        /// <value>The message.</value>
         public string msg { get; set; }
     }
-	/// <summary>
-	/// U cdata.
-	/// </summary>
-    public class UCdata
-    {
-		/// <summary>
-		/// Gets or sets the ucid.
-		/// </summary>
-		/// <value>The ucid.</value>
+    /// <summary>
+    /// U cdata.
+    /// </summary>
+    public class UCdata {
+        /// <summary>
+        /// Gets or sets the ucid.
+        /// </summary>
+        /// <value>The ucid.</value>
         public string ucid { get; set; }
-		/// <summary>
-		/// Gets or sets the name of the nick.
-		/// </summary>
-		/// <value>The name of the nick.</value>
+        /// <summary>
+        /// Gets or sets the name of the nick.
+        /// </summary>
+        /// <value>The name of the nick.</value>
         public string nickName { get; set; }
     }
 }

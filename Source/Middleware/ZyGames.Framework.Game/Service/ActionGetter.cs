@@ -26,13 +26,11 @@ using ServiceStack.Text;
 using ZyGames.Framework.Game.Contract;
 using ZyGames.Framework.Script;
 
-namespace ZyGames.Framework.Game.Service
-{
+namespace ZyGames.Framework.Game.Service {
     /// <summary>
     /// action Parameter
     /// </summary>
-    public class ActionGetter
-    {
+    public class ActionGetter {
         /// <summary>
         /// 
         /// </summary>
@@ -47,8 +45,7 @@ namespace ZyGames.Framework.Game.Service
         /// </summary>
         /// <param name="package"></param>
         /// <param name="session"></param>
-        public ActionGetter(RequestPackage package, GameSession session)
-        {
+        public ActionGetter(RequestPackage package, GameSession session) {
             ReqPackage = package;
             _session = session;
             OpCode = package.OpCode;
@@ -57,18 +54,15 @@ namespace ZyGames.Framework.Game.Service
         /// <summary>
         /// 
         /// </summary>
-        public RequestPackage RequestPackage
-        {
+        public RequestPackage RequestPackage {
             get { return ReqPackage; }
         }
 
         /// <summary>
         /// get request input bytes, socket use '\r\n\r\n' split message.
         /// </summary>
-        public byte[] InputStreamBytes
-        {
-            get
-            {
+        public byte[] InputStreamBytes {
+            get {
                 return ReqPackage.Message as byte[];
             }
         }
@@ -82,47 +76,41 @@ namespace ZyGames.Framework.Game.Service
         /// <summary>
         /// MsgId
         /// </summary>
-        public virtual int GetMsgId()
-        {
+        public virtual int GetMsgId() {
             return ReqPackage.MsgId;
         }
 
         /// <summary>
         /// St
         /// </summary>
-        public virtual string GetSt()
-        {
+        public virtual string GetSt() {
             return "st";
         }
 
         /// <summary>
         /// ActoinId
         /// </summary>
-        public virtual int GetActionId()
-        {
+        public virtual int GetActionId() {
             return ReqPackage.ActionId;
         }
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public virtual string GetRouteName()
-        {
+        public virtual string GetRouteName() {
             return ReqPackage.RouteName;
         }
         /// <summary>
         /// get current UserId.
         /// </summary>
-        public virtual int GetUserId()
-        {
+        public virtual int GetUserId() {
             return ReqPackage.UserId;
         }
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public virtual string GetSessionId()
-        {
+        public virtual string GetSessionId() {
             return SessionId;
         }
 
@@ -130,8 +118,7 @@ namespace ZyGames.Framework.Game.Service
         /// 
         /// </summary>
         /// <returns></returns>
-        public virtual ProtocolVersion GetPtcl()
-        {
+        public virtual ProtocolVersion GetPtcl() {
             return ReqPackage.Ptcl;
         }
 
@@ -143,23 +130,20 @@ namespace ZyGames.Framework.Game.Service
         /// <summary>
         /// get address for remote
         /// </summary>
-        public string RemoteAddress
-        {
+        public string RemoteAddress {
             get { return _session != null ? _session.RemoteAddress : string.Empty; }
         }
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public GameSession GetSession()
-        {
+        public GameSession GetSession() {
             return Session;
         }
         /// <summary>
         /// get current session.
         /// </summary>
-        public GameSession Session
-        {
+        public GameSession Session {
             get { return _session; }
         }
 
@@ -167,8 +151,7 @@ namespace ZyGames.Framework.Game.Service
         /// Is Runloader tool's param
         /// </summary>
         /// <returns></returns>
-        public virtual bool IsRunloader()
-        {
+        public virtual bool IsRunloader() {
             return false;
         }
 
@@ -176,16 +159,14 @@ namespace ZyGames.Framework.Game.Service
         /// Get custom message
         /// </summary>
         /// <returns></returns>
-        public object GetMessage()
-        {
+        public object GetMessage() {
             return ReqPackage.Message;
         }
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public virtual string ToParamString()
-        {
+        public virtual string ToParamString() {
             return ReqPackage.ToJson();
         }
 
@@ -195,8 +176,7 @@ namespace ZyGames.Framework.Game.Service
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public virtual string this[string key]
-        {
+        public virtual string this[string key] {
             get { throw new NotImplementedException(); }
             set { throw new NotImplementedException(); }
         }
@@ -205,16 +185,14 @@ namespace ZyGames.Framework.Game.Service
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public virtual long GetLongValue(string param)
-        {
+        public virtual long GetLongValue(string param) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual long GetLongValue(string param, long min, long max, bool isRequired = true)
-        {
+        public virtual long GetLongValue(string param, long min, long max, bool isRequired = true) {
             throw new NotImplementedException();
         }
 
@@ -223,64 +201,56 @@ namespace ZyGames.Framework.Game.Service
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public virtual int GetIntValue(string param)
-        {
+        public virtual int GetIntValue(string param) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual int GetIntValue(string param, int min, int max, bool isRequired = true)
-        {
+        public virtual int GetIntValue(string param, int min, int max, bool isRequired = true) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual short GetWordValue(string param)
-        {
+        public virtual short GetWordValue(string param) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual short GetWordValue(string param, short min, short max, bool isRequired = true)
-        {
+        public virtual short GetWordValue(string param, short min, short max, bool isRequired = true) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual byte GetByteValue(string param)
-        {
+        public virtual byte GetByteValue(string param) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual byte GetByteValue(string param, byte min, byte max, bool isRequired = true)
-        {
+        public virtual byte GetByteValue(string param, byte min, byte max, bool isRequired = true) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual string GetStringValue(string param)
-        {
+        public virtual string GetStringValue(string param) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual string GetStringValue(string param, int min, int max, bool isRequired = true)
-        {
+        public virtual string GetStringValue(string param, int min, int max, bool isRequired = true) {
             throw new NotImplementedException();
         }
 
@@ -288,87 +258,76 @@ namespace ZyGames.Framework.Game.Service
         /// 
         /// </summary>
         [LuaMethod("ActionGetter_GetInt")]
-        public virtual int GetInt(string param)
-        {
+        public virtual int GetInt(string param) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual short GetWord(string param)
-        {
+        public virtual short GetWord(string param) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual Byte GetByte(string param)
-        {
+        public virtual Byte GetByte(string param) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual string GetString(string param)
-        {
+        public virtual string GetString(string param) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual T GetEnum<T>(string param) where T : struct
-        {
+        public virtual T GetEnum<T>(string param) where T : struct {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual bool Contains(string param)
-        {
+        public virtual bool Contains(string param) {
             throw new NotImplementedException();
         }
         /// <summary>
         /// 
         /// </summary>
-        public virtual bool GetInt(string aName, ref Int32 rValue)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public virtual bool GetLong(string aName, ref long rValue, long minValue = 0, long maxValue = long.MaxValue)
-        {
+        public virtual bool GetInt(string aName, ref Int32 rValue) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual bool GetInt(string aName, ref Int32 rValue, Int32 minValue, Int32 maxValue)
-        {
+        public virtual bool GetLong(string aName, ref long rValue, long minValue = 0, long maxValue = long.MaxValue) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual bool GetWord(string aName, ref Int16 rValue)
-        {
+        public virtual bool GetInt(string aName, ref Int32 rValue, Int32 minValue, Int32 maxValue) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual bool GetWord(string aName, ref Int16 rValue, Int16 minValue, Int16 maxValue)
-        {
+        public virtual bool GetWord(string aName, ref Int16 rValue) {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual bool GetWord(string aName, ref Int16 rValue, Int16 minValue, Int16 maxValue) {
             throw new NotImplementedException();
         }
 
@@ -378,87 +337,76 @@ namespace ZyGames.Framework.Game.Service
         /// <param name="aName"></param>
         /// <param name="rValue"></param>
         /// <returns></returns>
-        public virtual bool GetInt(string aName, ref uint rValue)
-        {
+        public virtual bool GetInt(string aName, ref uint rValue) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual bool GetInt(string aName, ref uint rValue, uint minValue, uint maxValue)
-        {
+        public virtual bool GetInt(string aName, ref uint rValue, uint minValue, uint maxValue) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual bool GetWord(string aName, ref ushort rValue)
-        {
+        public virtual bool GetWord(string aName, ref ushort rValue) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual bool GetWord(string aName, ref ushort rValue, ushort minValue, ushort maxValue)
-        {
+        public virtual bool GetWord(string aName, ref ushort rValue, ushort minValue, ushort maxValue) {
             throw new NotImplementedException();
         }
         /// <summary>
         /// 
         /// </summary>
-        public virtual bool GetBool(string aName, ref bool rValue)
-        {
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public virtual bool GetByte(string aName, ref Byte rValue)
-        {
+        public virtual bool GetBool(string aName, ref bool rValue) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual bool GetByte(string aName, ref Byte rValue, Byte minValue, Byte maxValue)
-        {
+        public virtual bool GetByte(string aName, ref Byte rValue) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual bool GetString(string aName, ref String rValue, bool ignoreError = false)
-        {
+        public virtual bool GetByte(string aName, ref Byte rValue, Byte minValue, Byte maxValue) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual bool GetString(string aName, ref String rValue, int minValue, int maxValue, bool ignoreError = false)
-        {
+        public virtual bool GetString(string aName, ref String rValue, bool ignoreError = false) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual bool GetEnum<T>(string aName, ref T rValue) where T : struct
-        {
+        public virtual bool GetString(string aName, ref String rValue, int minValue, int maxValue, bool ignoreError = false) {
             throw new NotImplementedException();
         }
 
         /// <summary>
         /// 
         /// </summary>
-        public virtual bool CheckSign()
-        {
+        public virtual bool GetEnum<T>(string aName, ref T rValue) where T : struct {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public virtual bool CheckSign() {
             return true;
         }
         #endregion
@@ -467,8 +415,7 @@ namespace ZyGames.Framework.Game.Service
         /// 
         /// </summary>
         /// <returns></returns>
-        public override string ToString()
-        {
+        public override string ToString() {
             return string.Format("Url:{0}, Uid:{1}, Pid:{2}\r\nHost:{3}",
                 ToParamString(),
                 Session.UserId,

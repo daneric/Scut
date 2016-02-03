@@ -29,62 +29,46 @@ using ZyGames.Framework.Common;
 using ZyGames.Framework.Game.Contract;
 using ZyGames.Framework.Game.Service;
 
-namespace GameServer.CsScript.Action
-{
-    public class Action1001 : BaseStruct
-    {
-        private int PageIndex;
-        private int PageSize;
-        private int PageCount;
+namespace GameServer.CsScript.Action {
+    public class Action1001 : BaseStruct {
+        private int pageIndex;
+        private int pageSize;
+        private int pageCount;
         private List<UserRanking> rankingList;
 
-
         public Action1001(HttpGet httpGet)
-            : base(1001, httpGet)
-        {
-
+            : base(1001, httpGet) {
         }
 
-        public override void BuildPacket()
-        {
-            this.PushIntoStack(PageCount);
-            this.PushIntoStack(rankingList.Count);
-            foreach (var item in rankingList)
-            {
+        public override void BuildPacket() {
+            PushIntoStack(pageCount);
+            PushIntoStack(rankingList.Count);
+            foreach (var item in rankingList) {
                 DataStruct dsItem = new DataStruct();
                 dsItem.PushIntoStack(item.UserName);
-                dsItem.PushIntoStack(item.Score); 
+                dsItem.PushIntoStack(item.Score);
                 //Console.WriteLine("Num count:{0}", item.Items.Count);
-                this.PushIntoStack(dsItem);
+                PushIntoStack(dsItem);
             }
 
         }
 
-        public override bool GetUrlElement()
-        {
-            if (httpGet.GetInt("PageIndex", ref PageIndex)
-                 && httpGet.GetInt("PageSize", ref PageSize))
-            {
-                return true;
-            }
-            return false;
+        public override bool GetUrlElement() {
+            return (httpGet.GetInt("PageIndex", ref pageIndex) && httpGet.GetInt("PageSize", ref pageSize));
         }
 
-        public override bool TakeAction()
-        {
+        public override bool TakeAction() {
             var cache = new ShareCacheStruct<UserRanking>();
             rankingList = cache.FindAll(false);
             rankingList = MathUtils.QuickSort<UserRanking>(rankingList, compareTo);
-            rankingList = rankingList.GetPaging(PageIndex, PageSize, out PageCount);
+            rankingList = rankingList.GetPaging(pageIndex, pageSize, out pageCount);
             return true;
         }
 
-        private int compareTo(UserRanking x, UserRanking y)
-        {
+        private int compareTo(UserRanking x, UserRanking y) {
             int result = y.Score - x.Score;
-            if (result == 0)
-            {
-                result = y.UserID - x.UserID;
+            if (result == 0) {
+                result = y.UserId - x.UserId;
             }
             return result;
         }

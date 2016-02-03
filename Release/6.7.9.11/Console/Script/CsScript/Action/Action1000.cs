@@ -27,52 +27,37 @@ using ZyGames.Framework.Cache.Generic;
 using ZyGames.Framework.Game.Contract;
 using ZyGames.Framework.Game.Service;
 
-namespace GameServer.CsScript.Action
-{
-    public class Action1000 : BaseStruct
-    {
-        private string UserName;
-        private int Score;
+namespace GameServer.CsScript.Action {
+    public class Action1000 : BaseStruct {
+        private string userName;
+        private int score;
 
 
         public Action1000(HttpGet httpGet)
-            : base(1000, httpGet)
-        {
+            : base(1000, httpGet) {
         }
 
-        public override void BuildPacket()
-        {
-
+        public override void BuildPacket() {
         }
 
-        public override bool GetUrlElement()
-        {
-            if (httpGet.GetString("UserName", ref UserName)
-                 && httpGet.GetInt("Score", ref Score))
-            {
-                return true;
-            }
-            return false;
+        public override bool GetUrlElement() {
+            return (httpGet.GetString("UserName", ref userName) && httpGet.GetInt("Score", ref score));
         }
 
-        public override bool TakeAction()
-        {
+        public override bool TakeAction() {
             var cache = new ShareCacheStruct<UserRanking>();
-            var ranking = cache.Find(m => m.UserName == UserName);
-            if (ranking == null)
-            {
-                var user = new GameUser() { UserId = (int)cache.GetNextNo(), NickName = UserName};
+            var ranking = cache.Find(m => m.UserName == userName);
+            if (ranking == null) {
+                var user = new GameUser() { UserId = (int)cache.GetNextNo(), NickName = userName };
                 new PersonalCacheStruct<GameUser>().Add(user);
                 ranking = new UserRanking();
-                ranking.UserID = user.UserId;
-                ranking.UserName = UserName;
-                ranking.Score = Score;
+                ranking.UserId = user.UserId;
+                ranking.UserName = userName;
+                ranking.Score = score;
                 cache.Add(ranking);
-            }
-            else
-            {
-                ranking.UserName = UserName;
-                ranking.Score = Score;
+            } else {
+                ranking.UserName = userName;
+                ranking.Score = score;
             }
             return true;
         }

@@ -30,13 +30,11 @@ using ZyGames.Framework.Common.Security;
 using ZyGames.Framework.Data;
 using ZyGames.Framework.Game.Config;
 
-namespace ZyGames.Framework.Game.Sns
-{
+namespace ZyGames.Framework.Game.Sns {
     /// <summary>
     /// Reg type.
     /// </summary>
-    public enum RegType
-    {
+    public enum RegType {
         /// <summary>
         /// 正常形式
         /// </summary>
@@ -53,8 +51,7 @@ namespace ZyGames.Framework.Game.Sns
     /// <summary>
     /// Pwd type.
     /// </summary>
-    public enum PwdType
-    {
+    public enum PwdType {
         /// <summary>
         /// The DE.
         /// </summary>
@@ -68,8 +65,7 @@ namespace ZyGames.Framework.Game.Sns
     /// <summary>
     /// SnsCenterUser 的摘要说明
     /// </summary>
-    public class SnsCenterUser
-    {
+    public class SnsCenterUser {
         /// <summary>
         /// Md5 key
         /// </summary>
@@ -79,48 +75,44 @@ namespace ZyGames.Framework.Game.Sns
         /// </summary>
         /// <returns>The encrypt md5.</returns>
         /// <param name="str">String.</param>
-        public static string PasswordEncryptMd5(string str)
-        {
+        public static string PasswordEncryptMd5(string str) {
             return CryptoHelper.RegUser_MD5_Pwd(str);
         }
 
         /// <summary>
         /// 官网渠道ID
         /// </summary>
-        private const string SysetmRetailID = "0000";
-        private int _userid;
+        private const string SystemRetailId = "0000";
+        private int userId;
         /// <summary>
         /// 获得用户ID
         /// </summary>
         /// 
-        public int UserId { get { return _userid; } }
-        private string _PassportId = String.Empty;
-        private string _PassportPwd = String.Empty;
-        private string _imei = String.Empty;
-        private BaseLog _Logger = new BaseLog();
+        public int UserId { get { return userId; } }
+        private string passportId = String.Empty;
+        private string password = String.Empty;
+        private string deviceId = String.Empty;
+        private BaseLog logger = new BaseLog();
 
         /// <summary>
         /// Gets the passport identifier.
         /// </summary>
         /// <value>The passport identifier.</value>
-        public string PassportId
-        {
-            get { return _PassportId; }
+        public string PassportId {
+            get { return passportId; }
         }
         /// <summary>
         /// Gets the password.
         /// </summary>
         /// <value>The password.</value>
-        public string Password
-        {
-            get { return _PassportPwd; }
+        public string Password {
+            get { return password; }
         }
         /// <summary>
         /// Gets or sets the retail I.
         /// </summary>
         /// <value>The retail I.</value>
-        public string RetailID
-        {
+        public string RetailId {
             get;
             set;
         }
@@ -128,8 +120,7 @@ namespace ZyGames.Framework.Game.Sns
         /// Gets or sets the weixin code.
         /// </summary>
         /// <value>The weixin code.</value>
-        public string WeixinCode
-        {
+        public string WeixinCode {
             get;
             set;
         }
@@ -137,8 +128,7 @@ namespace ZyGames.Framework.Game.Sns
         /// Gets or sets the retail user.
         /// </summary>
         /// <value>The retail user.</value>
-        public string RetailUser
-        {
+        public string RetailUser {
             get;
             set;
         }
@@ -146,31 +136,28 @@ namespace ZyGames.Framework.Game.Sns
         /// Gets or sets the type of the reg.
         /// </summary>
         /// <value>The type of the reg.</value>
-        public RegType RegType
-        {
+        public RegType RegType {
             get;
             set;
         }
         /// <summary>
         /// Initializes a new instance of the <see cref="ZyGames.Framework.Game.Sns.SnsCenterUser"/> class.
         /// </summary>
-        public SnsCenterUser()
-        {
+        public SnsCenterUser() {
             RegType = RegType.Other;
         }
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="sPassportId"></param>
-        /// <param name="passportPwd"></param>
+        /// <param name="passportId"></param>
+        /// <param name="password"></param>
         /// <param name="imei"></param>
-        public SnsCenterUser(string sPassportId, string passportPwd, string imei)
-        {
-            _PassportId = sPassportId.ToUpper();
-            _PassportPwd = passportPwd;
-            _imei = imei;
+        public SnsCenterUser(string passportId, string password, string imei) {
+            this.passportId = passportId.ToUpper();
+            this.password = password;
+            this.deviceId = imei;
             RegType = RegType.Guest;
-            RetailID = SysetmRetailID;
+            RetailId = SystemRetailId;
         }
 
         /// <summary>
@@ -178,49 +165,41 @@ namespace ZyGames.Framework.Game.Sns
         /// </summary>
         /// <param name="snsUser"></param>
         /// <returns></returns>
-        public bool ValidatePassport(SnsUser snsUser)
-        {
-            string password = _PassportPwd;
+        public bool ValidatePassport(SnsUser snsUser) {
+            string pwd = password;
 
-            if (snsUser.RegType == RegType.Normal)
-            {
-                if (snsUser.PwdType == PwdType.MD5)
-                {
-                    password = PasswordEncryptMd5(_PassportPwd);
+            if (snsUser.RegType == RegType.Normal) {
+                if (snsUser.PwdType == PwdType.MD5) {
+                    pwd = PasswordEncryptMd5(pwd);
                 }
-                return snsUser.PassportId == _PassportId && snsUser.Password == password;
+                return snsUser.PassportId == passportId && snsUser.Password == pwd;
             }
 
-            if (snsUser.RegType == RegType.Guest)
-            {
-                if (snsUser.PwdType == PwdType.MD5)
-                {
+            if (snsUser.RegType == RegType.Guest) {
+                if (snsUser.PwdType == PwdType.MD5) {
                     //判断是否已经MD5加密
-                    password = PasswordEncryptMd5(_PassportPwd);
+                    pwd = PasswordEncryptMd5(pwd);
                 }
-                return snsUser.PassportId == _PassportId &&
-                    snsUser.Password == password;
+                return snsUser.PassportId == passportId &&
+                    snsUser.Password == pwd;
             }
 
-            return snsUser.RetailID == RetailID &&
+            return snsUser.RetailId == RetailId &&
                    snsUser.RetailUser == RetailUser;
         }
 
         /// <summary>
-        /// 是否有绑定DeviceID
+        /// 是否有绑定DeviceId
         /// </summary>
         /// <returns></returns>
-        public SnsUser GetUserByDeviceId(string imei)
-        {
+        public SnsUser GetUserByDeviceId(string imei) {
             SnsUser snsUser = new SnsUser();
-            if (string.IsNullOrEmpty(imei))
-            {
+            if (string.IsNullOrEmpty(imei)) {
                 return snsUser;
             }
-            SetUserInfo(f =>
-            {
-                f.Condition = string.Format("RegType = 1 AND {0}", f.FormatExpression("DeviceID")); //Guest
-                f.AddParam("DeviceID", imei);
+            SetUserInfo(f => {
+                f.Condition = string.Format("RegType = 1 AND {0}", f.FormatExpression("DeviceId")); //Guest
+                f.AddParam("DeviceId", imei);
             }, snsUser);
             return snsUser;
         }
@@ -232,54 +211,44 @@ namespace ZyGames.Framework.Game.Sns
         /// <param name="paramNames">Parameter names.</param>
         /// <param name="paramValues">Parameter values.</param>
         /// <param name="isCustom"></param>
-        public int InsertSnsUser(string[] paramNames, string[] paramValues, bool isCustom)
-        {
+        public int InsertSnsUser(string[] paramNames, string[] paramValues, bool isCustom) {
             SnsPassport oSnsPassportLog = new SnsPassport();
-            if (!isCustom && !oSnsPassportLog.VerifyRegPassportId(_PassportId))
-            {
+            if (!isCustom && !oSnsPassportLog.VerifyRegPassportId(passportId)) {
                 return 0;
             }
             //md5加密
-            string password = PasswordEncryptMd5(_PassportPwd);
+            string pwd = PasswordEncryptMd5(this.password);
 
             var command = ConnectManager.Provider.CreateCommandStruct("SnsUserInfo", CommandMode.Insert);
             command.ReturnIdentity = true;
-            command.AddParameter("passportid", _PassportId);
-            command.AddParameter("passportpwd", password);
-            command.AddParameter("DeviceID", _imei);
+            command.AddParameter("PassportId", passportId);
+            command.AddParameter("Password", pwd);
+            command.AddParameter("DeviceId", deviceId);
             command.AddParameter("RegType", (int)RegType);
             command.AddParameter("RegTime", DateTime.Now);
-            command.AddParameter("RetailID", RetailID);
+            command.AddParameter("RetailId", RetailId);
             command.AddParameter("RetailUser", RetailUser);
             command.AddParameter("PwdType", (int)PwdType.MD5);
 
-            if (paramNames != null && paramValues != null)
-            {
-                for (int i = 0; i < paramNames.Length; i++)
-                {
+            if (paramNames != null && paramValues != null) {
+                for (int i = 0; i < paramNames.Length; i++) {
                     command.AddParameter(paramNames[i], paramValues.Length > i ? paramValues[i] : "");
                 }
             }
             command.Parser();
 
-            try
-            {
-                if (!isCustom && !oSnsPassportLog.SetPassportReg(_PassportId))
-                {
+            try {
+                if (!isCustom && !oSnsPassportLog.SetPassportReg(passportId)) {
                     throw new Exception("Set passport  State.Reg fail.");
                 }
-                using (var aReader = ConnectManager.Provider.ExecuteReader(CommandType.Text, command.Sql, command.Parameters))
-                {
-                    if (aReader.Read())
-                    {
-                        _userid = Convert.ToInt32(aReader[0]);
+                using (var aReader = ConnectManager.Provider.ExecuteReader(CommandType.Text, command.Sql, command.Parameters)) {
+                    if (aReader.Read()) {
+                        userId = Convert.ToInt32(aReader[0]);
                     }
                 }
-                return _userid;
-            }
-            catch (Exception ex)
-            {
-                _Logger.SaveLog(ex);
+                return userId;
+            } catch (Exception ex) {
+                logger.SaveLog(ex);
                 return 0;
             }
         }
@@ -287,8 +256,7 @@ namespace ZyGames.Framework.Game.Sns
         /// 向社区中心添加用户
         /// </summary>
         /// <returns></returns>
-        public int InsertSnsUser(bool isCustom)
-        {
+        public int InsertSnsUser(bool isCustom) {
             return InsertSnsUser(new string[0], new string[0], isCustom);
         }
 
@@ -298,17 +266,14 @@ namespace ZyGames.Framework.Game.Sns
         /// <param name="userId"></param>
         /// <param name="isReset">只重置密码</param>
         /// <returns></returns>
-        public int ChangePass(string userId, bool isReset = false)
-        {
-            try
-            {
+        public int ChangePassword(string userId, bool isReset = false) {
+            try {
                 //md5加密
-                string password = PasswordEncryptMd5(_PassportPwd);
+                string pwd = PasswordEncryptMd5(this.password);
 
                 var command = ConnectManager.Provider.CreateCommandStruct("SnsUserInfo", CommandMode.Modify);
-                command.AddParameter("passportpwd", password);
-                if (!isReset)
-                {
+                command.AddParameter("Password", pwd);
+                if (!isReset) {
                     command.AddParameter("RegType", (int)RegType.Normal);
                     command.AddParameter("PwdType", (int)PwdType.MD5);
                 }
@@ -316,75 +281,57 @@ namespace ZyGames.Framework.Game.Sns
                 command.Filter = ConnectManager.Provider.CreateCommandFilter();
 
                 var section = ConfigManager.Configger.GetFirstOrAddConfig<MiddlewareSection>();
-                if (userId.ToUpper().StartsWith(section.PreAccount))
-                {
-                    command.Filter.Condition = command.Filter.FormatExpression("PassportID");
-                    command.Filter.AddParam("PassportID", userId);
-                }
-                else
-                {
-                    command.Filter.Condition = command.Filter.FormatExpression("UserID");
-                    command.Filter.AddParam("UserID", userId);
+                if (userId.ToUpper().StartsWith(section.PreAccount)) {
+                    command.Filter.Condition = command.Filter.FormatExpression("PassportId");
+                    command.Filter.AddParam("PassportId", userId);
+                } else {
+                    command.Filter.Condition = command.Filter.FormatExpression("UserId");
+                    command.Filter.AddParam("UserId", userId);
                 }
                 command.Parser();
 
                 return ConnectManager.Provider.ExecuteQuery(CommandType.Text, command.Sql, command.Parameters);
-            }
-            catch (Exception ex)
-            {
-                _Logger.SaveLog(ex);
+            } catch (Exception ex) {
+                logger.SaveLog(ex);
                 return 0;
             }
         }
 
-
-        internal int ChangeUserInfo(string pid, SnsUser snsuser)
-        {
-            try
-            {
+        internal int ChangeUserInfo(string pid, SnsUser snsuser) {
+            try {
                 var command = ConnectManager.Provider.CreateCommandStruct("SnsUserInfo", CommandMode.Modify);
-                if (!string.IsNullOrEmpty(snsuser.Mobile))
-                {
+                if (!string.IsNullOrEmpty(snsuser.Mobile)) {
                     command.AddParameter("Mobile", snsuser.Mobile);
                 }
-                if (!string.IsNullOrEmpty(snsuser.Mail))
-                {
+                if (!string.IsNullOrEmpty(snsuser.Mail)) {
                     command.AddParameter("Mail", snsuser.Mail);
                 }
-                if (!string.IsNullOrEmpty(snsuser.RealName))
-                {
+                if (!string.IsNullOrEmpty(snsuser.RealName)) {
                     command.AddParameter("RealName", snsuser.RealName);
                 }
-                if (!string.IsNullOrEmpty(snsuser.IDCards))
-                {
-                    command.AddParameter("IDCards", snsuser.IDCards);
+                if (!string.IsNullOrEmpty(snsuser.IdCards)) {
+                    command.AddParameter("IdCards", snsuser.IdCards);
                 }
-                if (!string.IsNullOrEmpty(snsuser.ActiveCode))
-                {
+                if (!string.IsNullOrEmpty(snsuser.ActiveCode)) {
                     command.AddParameter("ActiveCode", snsuser.ActiveCode);
                 }
-                if (snsuser.SendActiveDate > DateTime.MinValue)
-                {
+                if (snsuser.SendActiveDate > DateTime.MinValue) {
                     command.AddParameter("SendActiveDate", snsuser.SendActiveDate);
                 }
-                if (snsuser.ActiveDate > DateTime.MinValue)
-                {
+                if (snsuser.ActiveDate > DateTime.MinValue) {
                     command.AddParameter("ActiveDate", snsuser.ActiveDate);
                 }
-                if (!string.IsNullOrEmpty(snsuser.WeixinCode))
-                {
+                if (!string.IsNullOrEmpty(snsuser.WeixinCode)) {
                     command.AddParameter("WeixinCode", snsuser.WeixinCode);
                 }
                 command.Filter = ConnectManager.Provider.CreateCommandFilter();
-                command.Filter.Condition = command.Filter.FormatExpression("PassportID");
-                command.Filter.AddParam("PassportID", pid);
+                command.Filter.Condition = command.Filter.FormatExpression("PassportId");
+                command.Filter.AddParam("PassportId", pid);
                 command.Parser();
 
                 return ConnectManager.Provider.ExecuteQuery(CommandType.Text, command.Sql, command.Parameters);
-            }
-            catch (Exception ex)
-            {
-                _Logger.SaveLog(ex);
+            } catch (Exception ex) {
+                logger.SaveLog(ex);
                 return 0;
             }
         }
@@ -393,16 +340,15 @@ namespace ZyGames.Framework.Game.Sns
         /// </summary>
         /// <param name="device"></param>
         /// <returns></returns>
-        public static bool CheckDevice(string device)
-        {
+        public static bool CheckDevice(string device) {
             if (string.IsNullOrEmpty(device))
                 return true;
 
             var command = ConnectManager.Provider.CreateCommandStruct("LimitDevice", CommandMode.Inquiry);
-            command.Columns = "COUNT(DeviceID)";
+            command.Columns = "COUNT(DeviceId)";
             command.Filter = ConnectManager.Provider.CreateCommandFilter();
-            command.Filter.Condition = command.Filter.FormatExpression("DeviceID");
-            command.Filter.AddParam("DeviceID", device);
+            command.Filter.Condition = command.Filter.FormatExpression("DeviceId");
+            command.Filter.AddParam("DeviceId", device);
             command.Parser();
 
             int count = Convert.ToInt32(ConnectManager.Provider.ExecuteScalar(CommandType.Text, command.Sql, command.Parameters));
@@ -413,11 +359,9 @@ namespace ZyGames.Framework.Game.Sns
         /// </summary>
         /// <param name="passportId"></param>
         /// <returns></returns>
-        public SnsUser GetUserInfo(string passportId)
-        {
+        public SnsUser GetUserInfo(string passportId) {
             SnsUser snsUser = new SnsUser();
-            SetUserInfo(f =>
-            {
+            SetUserInfo(f => {
                 f.Condition = f.FormatExpression("PassportId");
                 f.AddParam("PassportId", passportId);
             }, snsUser);
@@ -427,16 +371,14 @@ namespace ZyGames.Framework.Game.Sns
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="retailID"></param>
+        /// <param name="retailId"></param>
         /// <param name="retailUser"></param>
         /// <returns></returns>
-        public SnsUser GetUserInfo(string retailID, string retailUser)
-        {
+        public SnsUser GetUserInfo(string retailId, string retailUser) {
             SnsUser snsUser = new SnsUser();
-            SetUserInfo(f =>
-            {
-                f.Condition = string.Format("{0} AND {1}", f.FormatExpression("RetailID"), f.FormatExpression("RetailUser"));
-                f.AddParam("RetailID", retailID);
+            SetUserInfo(f => {
+                f.Condition = string.Format("{0} AND {1}", f.FormatExpression("RetailId"), f.FormatExpression("RetailUser"));
+                f.AddParam("RetailId", retailId);
                 f.AddParam("RetailUser", retailUser);
             }, snsUser);
             return snsUser;
@@ -447,53 +389,47 @@ namespace ZyGames.Framework.Game.Sns
         /// </summary>
         /// <param name="openId"></param>
         /// <returns></returns>
-        public SnsUser GetUserByWeixin(string openId)
-        {
+        public SnsUser GetUserByWeixin(string openId) {
             SnsUser snsUser = new SnsUser();
-            SetUserInfo(f =>
-            {
+            SetUserInfo(f => {
                 f.Condition = f.FormatExpression("WeixinCode");
                 f.AddParam("WeixinCode", openId);
             }, snsUser);
             return snsUser;
         }
 
-        private void SetUserInfo(Action<CommandFilter> match, SnsUser snsUser)
-        {
+        private void SetUserInfo(Action<CommandFilter> match, SnsUser snsUser) {
             var command = ConnectManager.Provider.CreateCommandStruct("SnsUserInfo", CommandMode.Inquiry);
             command.OrderBy = "USERID ASC";
-            command.Columns = "UserId,PassportID,PassportPwd,DeviceID,RegType,RegTime,RetailID,RetailUser,Mobile,Mail,PwdType,RealName,IDCards,ActiveCode,SendActiveDate,ActiveDate,WeixinCode";
+            command.Columns = "UserId,PassportId,Password,DeviceId,RegType,RegTime,RetailId,RetailUser,Mobile,Mail,PwdType,RealName,IdCards,ActiveCode,SendActiveDate,ActiveDate,WeixinCode";
             command.Filter = ConnectManager.Provider.CreateCommandFilter();
             match(command.Filter);
             command.Parser();
 
-            using (var aReader = ConnectManager.Provider.ExecuteReader(CommandType.Text, command.Sql, command.Parameters))
-            {
-                if (aReader.Read())
-                {
-                    snsUser.UserId = Convert.ToInt32(aReader["UserId"]);
-                    snsUser.IMEI = Convert.ToString(aReader["DeviceID"]);
-                    snsUser.PassportId = Convert.ToString(aReader["PassportID"]);
-                    snsUser.Password = Convert.ToString(aReader["PassportPwd"]);
-                    snsUser.RegTime = Convert.ToDateTime(aReader["RegTime"]);
-                    snsUser.RetailID = Convert.ToString(aReader["RetailID"]);
-                    snsUser.RetailUser = Convert.ToString(aReader["RetailUser"]);
-                    snsUser.Mobile = Convert.ToString(aReader["Mobile"]);
-                    snsUser.Mail = Convert.ToString(aReader["Mail"]);
-                    snsUser.RealName = Convert.ToString(aReader["RealName"]);
-                    snsUser.IDCards = Convert.ToString(aReader["IDCards"]);
-                    snsUser.ActiveCode = Convert.ToString(aReader["ActiveCode"]);
-                    snsUser.SendActiveDate = ToDate(Convert.ToString(aReader["SendActiveDate"]));
-                    snsUser.ActiveDate = ToDate(Convert.ToString(aReader["ActiveDate"]));
-                    snsUser.WeixinCode = Convert.ToString(aReader["WeixinCode"]);
-                    snsUser.PwdType = (PwdType)Enum.ToObject(typeof(PwdType), Convert.ToInt32(aReader["PwdType"]));
-                    snsUser.RegType = (RegType)Enum.ToObject(typeof(RegType), Convert.ToInt32(aReader["RegType"]));
+            using (var reader = ConnectManager.Provider.ExecuteReader(CommandType.Text, command.Sql, command.Parameters)) {
+                if (reader.Read()) {
+                    snsUser.UserId = Convert.ToInt32(reader["UserId"]);
+                    snsUser.DeviceId = Convert.ToString(reader["DeviceId"]);
+                    snsUser.PassportId = Convert.ToString(reader["PassportId"]);
+                    snsUser.Password = Convert.ToString(reader["Password"]);
+                    snsUser.RegTime = Convert.ToDateTime(reader["RegTime"]);
+                    snsUser.RetailId = Convert.ToString(reader["RetailId"]);
+                    snsUser.RetailUser = Convert.ToString(reader["RetailUser"]);
+                    snsUser.Mobile = Convert.ToString(reader["Mobile"]);
+                    snsUser.Mail = Convert.ToString(reader["Mail"]);
+                    snsUser.RealName = Convert.ToString(reader["RealName"]);
+                    snsUser.IdCards = Convert.ToString(reader["IdCards"]);
+                    snsUser.ActiveCode = Convert.ToString(reader["ActiveCode"]);
+                    snsUser.SendActiveDate = ToDate(Convert.ToString(reader["SendActiveDate"]));
+                    snsUser.ActiveDate = ToDate(Convert.ToString(reader["ActiveDate"]));
+                    snsUser.WeixinCode = Convert.ToString(reader["WeixinCode"]);
+                    snsUser.PwdType = (PwdType)Enum.ToObject(typeof(PwdType), Convert.ToInt32(reader["PwdType"]));
+                    snsUser.RegType = (RegType)Enum.ToObject(typeof(RegType), Convert.ToInt32(reader["RegType"]));
                 }
             }
         }
 
-        private DateTime ToDate(string str)
-        {
+        private DateTime ToDate(string str) {
             DateTime result;
             DateTime.TryParse(str, out result);
             return result;
@@ -502,17 +438,15 @@ namespace ZyGames.Framework.Game.Sns
         /// <summary>
         /// Adds the login log.
         /// </summary>
-        /// <param name="deviceID">Device I.</param>
-        /// <param name="passportID">Passport I.</param>
-        public static void AddLoginLog(string deviceID, string passportID)
-        {
-            if (string.IsNullOrEmpty(deviceID) || string.IsNullOrEmpty(passportID))
-            {
+        /// <param name="deviceId">Device I.</param>
+        /// <param name="passportId">Passport I.</param>
+        public static void AddLoginLog(string deviceId, string passportId) {
+            if (string.IsNullOrEmpty(deviceId) || string.IsNullOrEmpty(passportId)) {
                 return;
             }
             var command = ConnectManager.Provider.CreateCommandStruct("PassportLoginLog", CommandMode.Insert);
-            command.AddParameter("DeviceID", deviceID);
-            command.AddParameter("PassportID", passportID);
+            command.AddParameter("DeviceId", deviceId);
+            command.AddParameter("PassportId", passportId);
             command.AddParameter("LoginTime", MathUtils.Now);
             command.Parser();
 

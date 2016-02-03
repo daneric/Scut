@@ -27,69 +27,49 @@ using ProtoBuf;
 using ZyGames.Framework.Game.Context;
 using ZyGames.Framework.Model;
 
-namespace GameServer.Model
-{
+namespace GameServer.Model {
     [Serializable, ProtoContract]
     [EntityTable("ConnData")]
-    public class GameUser : BaseUser
-    {
+    public class GameUser : BaseUser {
         [ProtoMember(1)]
         [EntityField(true)]
         public int UserId { get; set; }
 
         [ProtoMember(2)]
         [EntityField]
-        public String NickName
-        {
-            get;
-            set;
-        }
+        public String NickName { get; set; }
 
         [ProtoMember(3)]
         [EntityField]
-        public String PassportId
-        {
-            get;
-            set;
-        }
+        public String PassportId { get; set; }
 
         [ProtoMember(4)]
         [EntityField]
-        public String RetailId
-        {
-            get;
-            set;
-        }
+        public String RetailId { get; set; }
 
-        public string SId { get; set; }
+        public string SessionId { get; set; }
 
-        protected override int GetIdentityId()
-        {
-            return UserId;
-        }
-        
-        public override int GetUserId()
-        {
+        protected override int GetIdentityId() {
             return UserId;
         }
 
-        public override string GetNickName()
-        {
+        public override int GetUserId() {
+            return UserId;
+        }
+
+        public override string GetNickName() {
             return NickName;
         }
 
-        public override string GetPassportId()
-        {
+        public override string GetPassportId() {
             return PassportId;
         }
 
-        public override string GetRetailId()
-        {
+        public override string GetRetailId() {
             return RetailId;
         }
 
-        public override bool IsLock
-        {
+        public override bool IsLock {
             get { return false; }
         }
 

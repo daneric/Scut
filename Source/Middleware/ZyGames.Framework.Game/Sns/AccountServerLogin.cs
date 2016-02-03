@@ -35,21 +35,18 @@ using ZyGames.Framework.Common.Serialization;
 using ZyGames.Framework.Game.Runtime;
 using ZyGames.Framework.Game.Sns.Service;
 
-namespace ZyGames.Framework.Game.Sns
-{
+namespace ZyGames.Framework.Game.Sns {
     /// <summary>
     /// 
     /// </summary>
-    public class AccountServerLogin : ILogin
-    {
+    public class AccountServerLogin : ILogin {
         private int _timeout;
         private readonly string _url;
         private readonly string _imei;
         /// <summary>
         /// 
         /// </summary>
-        public AccountServerLogin()
-        {
+        public AccountServerLogin() {
             ContentType = "application/json";
         }
 
@@ -61,8 +58,7 @@ namespace ZyGames.Framework.Game.Sns
         /// <param name="imei"></param>
         /// <param name="timeout"></param>
         public AccountServerLogin(string url, string token, string imei, int timeout = 3000)
-            : this()
-        {
+            : this() {
             _url = url;
             _imei = imei;
             _timeout = timeout;
@@ -73,11 +69,11 @@ namespace ZyGames.Framework.Game.Sns
         /// <summary>
         /// 
         /// </summary>
-        public string PassportID { get; protected set; }
+        public string PassportId { get; protected set; }
         /// <summary>
         /// 
         /// </summary>
-        public string UserID { get; protected set; }
+        public string UserId { get; protected set; }
         /// <summary>
         /// 
         /// </summary>
@@ -89,12 +85,11 @@ namespace ZyGames.Framework.Game.Sns
         /// <summary>
         /// 
         /// </summary>
-        public string SessionID { get; protected set; }
+        public string SessionId { get; protected set; }
         /// <summary>
         /// 
         /// </summary>
         public string Token { get; set; }
-
         /// <summary>
         /// 
         /// </summary>
@@ -110,32 +105,26 @@ namespace ZyGames.Framework.Game.Sns
         /// 
         /// </summary>
         /// <returns></returns>
-        public virtual string GetRegPassport()
-        {
+        public virtual string GetRegPassport() {
             var query = new Dictionary<string, string>();
             query["Handler"] = "Passport";
             query["IMEI"] = _imei;
             string queryString = HttpUtils.BuildPostParams(query);
-            using (var response = Send(queryString, _timeout))
-            {
+            using (var response = Send(queryString, _timeout)) {
                 var responseStream = response.GetResponseStream();
-                if (responseStream == null)
-                {
+                if (responseStream == null) {
                     TraceLog.Write("Response stream is null.\r\nUrl:{0}/?{1}", _url, queryString);
                     return null;
                 }
-                using (var sr = new StreamReader(responseStream, Encoding.UTF8))
-                {
+                using (var sr = new StreamReader(responseStream, Encoding.UTF8)) {
                     string json = sr.ReadToEnd();
                     var body = JsonUtils.Deserialize<ResponseBody<PassportInfo>>(json);
-                    if (body != null && body.StateCode == StateCode.OK)
-                    {
+                    if (body != null && body.StateCode == StateCode.OK) {
                         var token = body.Data as PassportInfo;
-                        if (token != null)
-                        {
-                            PassportID = token.PassportId;
+                        if (token != null) {
+                            PassportId = token.PassportId;
                             Password = token.Password;
-                            return PassportID;
+                            return PassportId;
                         }
                     }
                     TraceLog.WriteError("AccountServer get passport error:{0}", json);
@@ -147,50 +136,42 @@ namespace ZyGames.Framework.Game.Sns
         /// 
         /// </summary>
         /// <returns></returns>
-        public virtual bool CheckLogin()
-        {
+        public virtual bool CheckLogin() {
             var query = new Dictionary<string, string>();
             query["Handler"] = "Validate";
             query["Token"] = Token;
             string queryString = HttpUtils.BuildPostParams(query);
             queryString = AppendSign(queryString);
             string json;
-            using (var response = Send(queryString, _timeout))
-            {
+            using (var response = Send(queryString, _timeout)) {
                 var responseStream = response.GetResponseStream();
-                if (responseStream == null)
-                {
+                if (responseStream == null) {
                     TraceLog.Write("Response stream is null.\r\nUrl:{0}/?{1}", _url, queryString);
                     return false;
                 }
-                using (var sr = new StreamReader(responseStream, Encoding.UTF8))
-                {
+                using (var sr = new StreamReader(responseStream, Encoding.UTF8)) {
                     json = sr.ReadToEnd();
                     responseStream.Close();
                 }
             }
             var body = JsonUtils.Deserialize<ResponseBody<LoginToken>>(json);
-            if (body == null)
-            {
+            if (body == null) {
                 TraceLog.Write("Response stream convert to json error.Json:{0}\r\nUrl:{1}/?{2}", json, _url, queryString);
                 State = StateCode.ParseError;
                 return false;
             }
 
             State = body.StateCode;
-            if (body.StateCode == StateCode.OK)
-            {
+            if (body.StateCode == StateCode.OK) {
                 var token = body.Data as LoginToken;
-                if (token != null)
-                {
-                    PassportID = token.PassportId;
-                    UserID = token.UserId.ToString();
+                if (token != null) {
+                    PassportId = token.PassportId;
+                    UserId = token.UserId.ToString();
                     UserType = token.UserType;
                     return true;
                 }
             }
-            if (body.StateCode == StateCode.TokenExpired || body.StateCode == StateCode.NoToken)
-            {
+            if (body.StateCode == StateCode.TokenExpired || body.StateCode == StateCode.NoToken) {
                 TraceLog.Write("AccountServer login fail, StateCode:{0}-{1}", body.StateCode, body.StateDescription);
                 throw new HandlerException(body.StateCode, body.StateDescription);
             }
@@ -202,23 +183,19 @@ namespace ZyGames.Framework.Game.Sns
         /// 
         /// </summary>
         /// <returns></returns>
-        protected virtual WebResponse Send(string query, int timeout = 3000, bool isPost = false)
-        {
+        protected virtual WebResponse Send(string query, int timeout = 3000, bool isPost = false) {
             return isPost
                 ? HttpUtils.Post(_url, query, timeout, null, Encoding.UTF8, ContentType, null)
                 : HttpUtils.Get(string.Format("{0}/?{1}", _url, query), ContentType, timeout, null, null);
-
         }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="query"></param>
         /// <returns></returns>
-        protected string AppendSign(string query)
-        {
+        protected string AppendSign(string query) {
             string signKey = GameEnvironment.Setting != null ? GameEnvironment.Setting.ProductSignKey : "";
-            if (string.IsNullOrEmpty(signKey))
-            {
+            if (string.IsNullOrEmpty(signKey)) {
                 return query;
             }
             string sign = CryptoHelper.MD5_Encrypt(query + signKey, Encoding.UTF8);
@@ -229,8 +206,7 @@ namespace ZyGames.Framework.Game.Sns
     /// <summary>
     /// 直接连接Redis服务验证
     /// </summary>
-    public class AccountServerRedisLogin : AccountServerLogin
-    {
+    public class AccountServerRedisLogin : AccountServerLogin {
         private readonly string _host;
         private readonly int _db;
 
@@ -240,27 +216,26 @@ namespace ZyGames.Framework.Game.Sns
         /// <param name="host"></param>
         /// <param name="db"></param>
         /// <param name="token"></param>
-        public AccountServerRedisLogin(string host, int db, string token)
-        {
+        public AccountServerRedisLogin(string host, int db, string token) {
             _host = host;
             _db = db;
             Token = token;
         }
 
-
-        public override bool CheckLogin()
-        {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override bool CheckLogin() {
             UserToken userToken = null;
-            if ((userToken = HandlerManager.GetUserToken(Token, _host, _db)) == null)
-            {
+            if ((userToken = HandlerManager.GetUserToken(Token, _host, _db)) == null) {
                 return false;
             }
-            if (userToken.ExpireTime < DateTime.Now)
-            {
+            if (userToken.ExpireTime < DateTime.Now) {
                 return false;
             }
-            PassportID = userToken.PassportId;
-            UserID = userToken.UserId.ToString();
+            PassportId = userToken.PassportId;
+            UserId = userToken.UserId.ToString();
             UserType = userToken.UserType;
             return true;
         }

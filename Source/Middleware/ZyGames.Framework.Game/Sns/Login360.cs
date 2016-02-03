@@ -23,43 +23,31 @@ THE SOFTWARE.
 ****************************************************************************/
 using System.Web;
 
-namespace ZyGames.Framework.Game.Sns
-{
-	/// <summary>
-	/// Login360.
-	/// </summary>
-    public class Login360 : AbstractLogin
-    {
-        private string _retailID = string.Empty;
-        private string _pid = string.Empty;
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ZyGames.Framework.Game.Sns.Login360"/> class.
-		/// </summary>
-		/// <param name="retailID">Retail I.</param>
-		/// <param name="pid">Pid.</param>
-        public Login360(string retailID, string pid)
-        {
-            this._retailID = retailID;
-            this._pid = pid;
+namespace ZyGames.Framework.Game.Sns {
+    /// <summary>
+    /// Login360.
+    /// </summary>
+    public class Login360 : AbstractLogin {
+        private string retailId = string.Empty;
+        private string pid = string.Empty;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ZyGames.Framework.Game.Sns.Login360"/> class.
+        /// </summary>
+        /// <param name="retailId">Retail id.</param>
+        /// <param name="pid">Pid.</param>
+        public Login360(string retailId, string pid) {
+            this.retailId = retailId;
+            this.pid = pid;
         }
-		/// <summary>
-		/// 注册通行证
-		/// </summary>
-		/// <returns></returns>
-        public override string GetRegPassport()
-        {
-            return this.PassportID;
-        }
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <returns></returns>
-        public override bool CheckLogin()
-        {
-            string[] arr = SnsManager.LoginByRetail(_retailID, _pid);
-            this.UserID = arr[0];
-            this.PassportID = arr[1];
-            this.SessionID = GetSessionId();
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override bool CheckLogin() {
+            string[] arr = SnsManager.LoginByRetail(retailId, pid);
+            UserId = arr[0];
+            PassportId = arr[1];
+            SessionId = GetSessionId();
             return true;
         }
 

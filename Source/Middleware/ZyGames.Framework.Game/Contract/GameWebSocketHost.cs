@@ -37,18 +37,15 @@ using ZyGames.Framework.RPC.IO;
 using ZyGames.Framework.RPC.Sockets;
 using ZyGames.Framework.RPC.Sockets.WebSocket;
 
-namespace ZyGames.Framework.Game.Contract
-{
+namespace ZyGames.Framework.Game.Contract {
     /// <summary>
     /// 
     /// </summary>
-    public abstract class GameWebSocketHost : GameBaseHost
-    {
+    public abstract class GameWebSocketHost : GameBaseHost {
         /// <summary>
         /// Protocol Section
         /// </summary>
-        public ProtocolSection GetSection()
-        {
+        public ProtocolSection GetSection() {
             return ConfigManager.Configger.GetFirstOrAddConfig<ProtocolSection>();
         }
 
@@ -57,17 +54,13 @@ namespace ZyGames.Framework.Game.Contract
         /// </summary>
         protected bool EnableHttp;
 
-
         /// <summary>
         /// Action repeater
         /// </summary>
-        public IActionDispatcher ActionDispatcher
-        {
+        public IActionDispatcher ActionDispatcher {
             get { return _setting == null ? null : _setting.ActionDispatcher; }
-            set
-            {
-                if (_setting != null)
-                {
+            set {
+                if (_setting != null) {
                     _setting.ActionDispatcher = value;
                 }
             }
@@ -82,16 +75,14 @@ namespace ZyGames.Framework.Game.Contract
         /// </summary>
         /// <param name="isSecurity"></param>
         protected GameWebSocketHost(bool isSecurity = false)
-            : this(new WebSocketRequestHandler(isSecurity))
-        {
+            : this(new WebSocketRequestHandler(isSecurity)) {
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="requestHandler"></param>
-        protected GameWebSocketHost(WebSocketRequestHandler requestHandler)
-        {
+        protected GameWebSocketHost(WebSocketRequestHandler requestHandler) {
             _setting = GameEnvironment.Setting;
             int port = _setting != null ? _setting.GamePort : 0;
             IPEndPoint localEndPoint = new IPEndPoint(IPAddress.Any, port);
@@ -106,58 +97,27 @@ namespace ZyGames.Framework.Game.Contract
 
             var socketSettings = new SocketSettings(maxConnections, backlog, maxAcceptOps, bufferSize, localEndPoint, expireInterval, expireTime);
             socketListener = new SocketListener(socketSettings, requestHandler);
-            socketListener.DataReceived += new ConnectionEventHandler(OnDataReceived);
-            socketListener.Connected += new ConnectionEventHandler(socketLintener_OnConnectCompleted);
-            socketListener.Handshaked += new ConnectionEventHandler(OnHandshaked);
-            socketListener.Disconnected += new ConnectionEventHandler(OnDisconnected);
-            socketListener.OnPing += new ConnectionEventHandler(socketLintener_OnPing);
-            socketListener.OnPong += new ConnectionEventHandler(socketLintener_OnPong);
-            socketListener.OnClosedStatus += socketLintener_OnClosedStatus;
+            socketListener.DataReceived += DataReceivedEventHandler;
+            socketListener.Connected += ConnectedEventHandler;
+            socketListener.Disconnected += DisconnectedEventHandler;
+            socketListener.Handshaked += HandshakedEventHandler;
+            socketListener.OnPing += OnPingEventHandler;
+            socketListener.OnPong += OnPongEventHandler;
+            socketListener.OnClosedStatus += OnClosedStatusEventHandler;
         }
 
-        private void socketLintener_OnClosedStatus(ExSocket socket, int closeStatusCode)
-        {
-            try
-            {
-                OnClosedStatus(socket, closeStatusCode);
-            }
-            catch (Exception err)
-            {
-                TraceLog.WriteError("OnPong error:{0}", err);
-            }
-        }
-
-
-        private void socketLintener_OnConnectCompleted(ISocket sender, ConnectionEventArgs e)
-        {
-            try
-            {
-                var session = GameSession.CreateNew(e.Socket.HashCode, e.Socket, socketListener);
-                session.HeartbeatTimeoutHandle += OnHeartbeatTimeout;
-                OnConnectCompleted(sender, e);
-            }
-            catch (Exception err)
-            {
-                TraceLog.WriteError("ConnectCompleted error:{0}", err);
-            }
-        }
-
-        private void OnDataReceived(ISocket sender, ConnectionEventArgs e)
-        {
-            try
-            {
+        private void DataReceivedEventHandler(ISocket sender, ConnectionEventArgs e) {
+            try {
+                OnDataReceived(e);
                 RequestPackage package;
-                if (!ActionDispatcher.TryDecodePackage(e, out package))
-                {
+                if (!ActionDispatcher.TryDecodePackage(e, out package)) {
                     //check command
                     string command = e.Meaage.Message;
-                    if ("ping".Equals(command, StringComparison.OrdinalIgnoreCase))
-                    {
+                    if ("ping".Equals(command, StringComparison.OrdinalIgnoreCase)) {
                         OnPing(sender, e);
                         return;
                     }
-                    if ("pong".Equals(command, StringComparison.OrdinalIgnoreCase))
-                    {
+                    if ("pong".Equals(command, StringComparison.OrdinalIgnoreCase)) {
                         OnPong(sender, e);
                         return;
                     }
@@ -165,86 +125,89 @@ namespace ZyGames.Framework.Game.Contract
                     return;
                 }
                 var session = GetSession(e, package);
-                if (CheckSpecialPackge(package, session))
-                {
+                if (CheckSpecialPackge(package, session)) {
                     return;
                 }
                 package.Bind(session);
                 ProcessPackage(package, session).Wait();
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 TraceLog.WriteError("Received to Host:{0} error:{1}", e.Socket.RemoteEndPoint, ex);
             }
         }
 
-        private void OnDisconnected(ISocket sender, ConnectionEventArgs e)
-        {
-            try
-            {
+        private void ConnectedEventHandler(ISocket sender, ConnectionEventArgs e) {
+            try {
+                var session = GameSession.CreateNew(e.Socket.HashCode, e.Socket, socketListener);
+                session.HeartbeatTimeoutHandle += OnHeartbeatTimeout;
+                OnConnected(sender, e);
+            } catch (Exception err) {
+                TraceLog.WriteError("ConnectCompleted error:{0}", err);
+            }
+        }
+
+        private void DisconnectedEventHandler(ISocket sender, ConnectionEventArgs e) {
+            try {
                 GameSession session = GameSession.Get(e.Socket.HashCode);
-                if (session != null)
-                {
+                if (session != null) {
                     OnDisconnected(session);
                     session.ProxySid = Guid.Empty;
                     session.Close();
                 }
-            }
-            catch (Exception err)
-            {
+            } catch (Exception err) {
                 TraceLog.WriteError("Disconnected error:{0}", err);
             }
         }
 
-        private void socketLintener_OnPong(ISocket sender, ConnectionEventArgs e)
-        {
-            try
-            {
-                OnPong(sender, e);
-            }
-            catch (Exception err)
-            {
-                TraceLog.WriteError("OnPong error:{0}", err);
+        private void HandshakedEventHandler(ISocket sender, ConnectionEventArgs e) {
+            try {
+                OnHandshaked(sender, e);
+            } catch (Exception err) {
+                TraceLog.WriteError("OnHandshaked error:{0}", err);
             }
         }
 
-        private void socketLintener_OnPing(ISocket sender, ConnectionEventArgs e)
-        {
-            try
-            {
+        private void OnPingEventHandler(ISocket sender, ConnectionEventArgs e) {
+            try {
                 OnPing(sender, e);
-            }
-            catch (Exception err)
-            {
+            } catch (Exception err) {
                 TraceLog.WriteError("OnPing error:{0}", err);
             }
         }
 
-        private GameSession GetSession(ConnectionEventArgs e, RequestPackage package)
-        {
+        private void OnPongEventHandler(ISocket sender, ConnectionEventArgs e) {
+            try {
+                OnPong(sender, e);
+            } catch (Exception err) {
+                TraceLog.WriteError("OnPong error:{0}", err);
+            }
+        }
+
+        private void OnClosedStatusEventHandler(ExSocket socket, int closeStatusCode) {
+            try {
+                OnClosedStatus(socket, closeStatusCode);
+            } catch (Exception err) {
+                TraceLog.WriteError("OnPong error:{0}", err);
+            }
+        }
+
+        private GameSession GetSession(ConnectionEventArgs e, RequestPackage package) {
             //使用代理分发器时,每个ssid建立一个游服Serssion
             GameSession session;
-            if (package.ProxySid != Guid.Empty)
-            {
+            if (package.ProxySid != Guid.Empty) {
                 session = GameSession.Get(package.ProxySid) ??
                           (package.IsProxyRequest
                               ? GameSession.Get(e.Socket.HashCode)
                               : GameSession.CreateNew(package.ProxySid, e.Socket, socketListener));
-                if (session != null)
-                {
+                if (session != null) {
                     session.ProxySid = package.ProxySid;
                 }
-            }
-            else
-            {
+            } else {
                 session = GameSession.Get(package.SessionId) ?? GameSession.Get(e.Socket.HashCode);
             }
-            if (session == null)
-            {
+            if (session == null) {
                 session = GameSession.CreateNew(package.ProxySid, e.Socket, socketListener);
             }
-            if ((!session.Connected || !Equals(session.RemoteAddress, e.Socket.RemoteEndPoint.ToString())))
-            {
+            if ((!session.Connected || !Equals(session.RemoteAddress, e.Socket.RemoteEndPoint.ToString()))) {
                 GameSession.Recover(session, e.Socket.HashCode, e.Socket, socketListener);
             }
             session.InitSocket(e.Socket, socketListener);
@@ -252,60 +215,53 @@ namespace ZyGames.Framework.Game.Contract
         }
 
         /// <summary>
-        /// 
+        /// Raises the received before event.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        protected virtual void OnHandshaked(ISocket sender, ConnectionEventArgs e)
-        {
-
-        }
+        /// <param name="e">E.</param>
+        protected virtual void OnDataReceived(ConnectionEventArgs e) { }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        protected virtual void OnConnectCompleted(object sender, ConnectionEventArgs e)
-        {
-
-        }
+        protected virtual void OnConnected(object sender, ConnectionEventArgs e) { }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        protected virtual void OnPong(ISocket sender, ConnectionEventArgs e)
-        {
-        }
+        protected virtual void OnHandshaked(ISocket sender, ConnectionEventArgs e) { }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        protected virtual void OnPing(ISocket sender, ConnectionEventArgs e)
-        {
+        protected virtual void OnPing(ISocket sender, ConnectionEventArgs e) {
             sender.Pong(e.Socket);
         }
 
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        protected virtual void OnPong(ISocket sender, ConnectionEventArgs e) { }
+
+        /// <summary>
+        /// 
+        /// </summary>
         /// <param name="socket"></param>
         /// <param name="closeStatusCode"></param>
-        protected virtual void OnClosedStatus(ExSocket socket, int closeStatusCode)
-        {
-
-        }
+        protected virtual void OnClosedStatus(ExSocket socket, int closeStatusCode) { }
         /// <summary>
         /// 
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        protected virtual void OnError(ISocket sender, ConnectionEventArgs e)
-        {
+        protected virtual void OnError(ISocket sender, ConnectionEventArgs e) {
             sender.CloseHandshake(e.Socket, "param error");
         }
 
@@ -313,23 +269,12 @@ namespace ZyGames.Framework.Game.Contract
         /// 
         /// </summary>
         /// <param name="result"></param>
-        protected virtual void OnSendCompleted(SocketAsyncResult result)
-        {
-        }
-
-        /// <summary>
-        /// Raises the service stop event.
-        /// </summary>
-        protected override void OnServiceStop()
-        {
-            
-        }
+        protected virtual void OnSendCompleted(SocketAsyncResult result) { }
 
         /// <summary>
         /// 
         /// </summary>
-        public override void Start(string[] args)
-        {
+        public override void Start(string[] args) {
             socketListener.StartListen();
             TraceLog.WriteLine("{0} WebSocket service {1}:{2} is started.", DateTime.Now.ToString("HH:mm:ss"), _setting.GameIpAddress, _setting.GamePort);
             base.Start(args);
@@ -338,70 +283,49 @@ namespace ZyGames.Framework.Game.Contract
         /// <summary>
         /// 
         /// </summary>
-        public override void Stop()
-        {
+        public override void Stop() {
             base.Stop();
             socketListener.Dispose();
-            OnServiceStop();
-            try
-            {
+            try {
                 EntitySyncManger.Dispose();
-            }
-            catch { }
+            } catch { }
         }
 
-        private async System.Threading.Tasks.Task ProcessPackage(RequestPackage package, GameSession session)
-        {
+        private async System.Threading.Tasks.Task ProcessPackage(RequestPackage package, GameSession session) {
             if (package == null) return;
 
-            try
-            {
+            try {
                 ActionGetter actionGetter;
                 byte[] data = new byte[0];
-                if (!string.IsNullOrEmpty(package.RouteName))
-                {
+                if (!string.IsNullOrEmpty(package.RouteName)) {
                     actionGetter = ActionDispatcher.GetActionGetter(package, session);
-                    if (CheckRemote(package.RouteName, actionGetter))
-                    {
+                    if (CheckRemote(package.RouteName, actionGetter)) {
                         MessageStructure response = new MessageStructure();
                         OnCallRemote(package.RouteName, actionGetter, response);
                         data = response.PopBuffer();
-                    }
-                    else
-                    {
+                    } else {
                         return;
                     }
-                }
-                else
-                {
+                } else {
                     SocketGameResponse response = new SocketGameResponse();
                     response.WriteErrorCallback += ActionDispatcher.ResponseError;
                     actionGetter = ActionDispatcher.GetActionGetter(package, session);
                     DoAction(actionGetter, response);
                     data = response.ReadByte();
                 }
-                try
-                {
-                    if (session != null && data.Length > 0)
-                    {
+                try {
+                    if (session != null && data.Length > 0) {
                         await session.SendAsync(actionGetter.OpCode, data, 0, data.Length, OnSendCompleted);
                     }
-                }
-                catch (Exception ex)
-                {
+                } catch (Exception ex) {
                     TraceLog.WriteError("PostSend error:{0}", ex);
                 }
 
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 TraceLog.WriteError("Task error:{0}", ex);
-            }
-            finally
-            {
+            } finally {
                 if (session != null) session.ExitSession();
             }
         }
-
     }
 }

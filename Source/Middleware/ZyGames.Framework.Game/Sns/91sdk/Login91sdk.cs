@@ -28,126 +28,97 @@ using ZyGames.Framework.Game.Sns._91sdk;
 using ZyGames.Framework.Common.Log;
 using ZyGames.Framework.Common.Serialization;
 
-namespace ZyGames.Framework.Game.Sns
-{
+namespace ZyGames.Framework.Game.Sns {
     /// <summary>
     /// 91SDK 0001
     /// </summary>
-    public class Login91sdk : AbstractLogin
-    {
-        private string _retailID = string.Empty;
-        private string AppId;
-        private string AppKey;
-        private string Url;
+    public class Login91sdk : AbstractLogin {
+        private string retailId = string.Empty;
+        private string retailUser = string.Empty;
+        private string appId;
+        private string appKey;
+        private string url;
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ZyGames.Framework.Game.Sns.Login91sdk"/> class.
-		/// </summary>
-		/// <param name="retailID">Retail I.</param>
-		/// <param name="retailUser">Retail user.</param>
-		/// <param name="sessionID">Session I.</param>
-        public Login91sdk(string retailID, string retailUser, string sessionID)
-        {
-            this._retailID = retailID;
-            SessionID = sessionID;
-            Uin = retailUser;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ZyGames.Framework.Game.Sns.Login91sdk"/> class.
+        /// </summary>
+        /// <param name="retailId">Retail id.</param>
+        /// <param name="retailUser">Retail user id.</param>
+        /// <param name="sessionId">Session id.</param>
+        public Login91sdk(string retailId, string retailUser, string sessionId) {
+            this.retailId = retailId;
+            this.retailUser = retailUser;
+            SessionId = sessionId;
             GameChannel gameChannel = ZyGameBaseConfigManager.GameSetting.GetChannelSetting(ChannelType.channel91);
-            if (gameChannel != null)
-            {
-                Url = gameChannel.Url;
-                GameSdkSetting setting = gameChannel.GetSetting(retailID);
-                if (setting != null)
-                {
-                    AppId = setting.AppId;
-                    AppKey = setting.AppKey;
+            if (gameChannel != null) {
+                url = gameChannel.Url;
+                GameSdkSetting setting = gameChannel.GetSetting(retailId);
+                if (setting != null) {
+                    appId = setting.AppId;
+                    appKey = setting.AppKey;
+                } else {
+                    TraceLog.ReleaseWrite("The sdkChannel section channel91:{0} is null.", retailId);
                 }
-                else
-                {
-                    TraceLog.ReleaseWrite("The sdkChannel section channel91:{0} is null.", retailID);
-                }
-            }
-            else
-            {
+            } else {
                 TraceLog.ReleaseWrite("The sdkChannel 91 section is null.");
             }
         }
 
-
-        private string Uin
-        {
-            get;
-            set;
-        }
-		/// <summary>
-		/// 注册通行证
-		/// </summary>
-		/// <returns></returns>
-        public override string GetRegPassport()
-        {
-            return this.PassportID;
-        }
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <returns></returns>
-        public override bool CheckLogin()
-        {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override bool CheckLogin() {
             int Act = 4;
-            string Sign = string.Format("{0}{1}{2}{3}{4}", AppId.ToNotNullString(), Act, Uin.ToNotNullString(), SessionID.ToNotNullString(), AppKey.ToNotNullString());
+            string Sign = string.Format("{0}{1}{2}{3}{4}", appId.ToNotNullString(), Act, retailUser.ToNotNullString(), SessionId.ToNotNullString(), appKey.ToNotNullString());
             Sign = HashToMD5Hex(Sign);
 
             string urlData = string.Format("{0}?AppId={1}&Act={2}&Uin={3}&SessionID={4}&Sign={5}",
-                Url.ToNotNullString(),
-                AppId.ToNotNullString(),
+                url.ToNotNullString(),
+                appId.ToNotNullString(),
                 Act,
-                Uin.ToNotNullString(),
-                SessionID.ToNotNullString(),
+                retailUser.ToNotNullString(),
+                SessionId.ToNotNullString(),
                 Sign.ToNotNullString()
             );
 
             string result = HttpPostManager.GetStringData(urlData);
-            try
-            {
-                if (string.IsNullOrEmpty(result))
-                {
+            try {
+                if (string.IsNullOrEmpty(result)) {
                     TraceLog.ReleaseWrite("91sdk login fail result:{0},request url:{1}", result, urlData);
                     return false;
                 }
                 SDKError sdk = JsonUtils.Deserialize<SDKError>(result);
-                if (sdk.ErrorCode != "1")
-                {
+                if (sdk.ErrorCode != "1") {
                     TraceLog.ReleaseWrite("91sdk login fail:{0},request url:{1}", sdk.ErrorDesc, urlData);
                     return false;
                 }
-                string[] arr = SnsManager.LoginByRetail(_retailID, Uin);
-                this.UserID = arr[0];
-                this.PassportID = arr[1];
+                string[] arr = SnsManager.LoginByRetail(retailId, retailUser);
+                UserId = arr[0];
+                PassportId = arr[1];
                 return true;
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 new BaseLog().SaveLog(ex);
-                return false;
             }
+            return false;
 
             //return !string.IsNullOrEmpty(UserID) && UserID != "0";
         }
 
     }
-	/// <summary>
-	/// SDK error.
-	/// </summary>
-    public class SDKError
-    {
-		/// <summary>
-		/// Gets or sets the error code.
-		/// </summary>
-		/// <value>The error code.</value>
+    /// <summary>
+    /// SDK error.
+    /// </summary>
+    public class SDKError {
+        /// <summary>
+        /// Gets or sets the error code.
+        /// </summary>
+        /// <value>The error code.</value>
         public string ErrorCode { get; set; }
-		/// <summary>
-		/// Gets or sets the error desc.
-		/// </summary>
-		/// <value>The error desc.</value>
+        /// <summary>
+        /// Gets or sets the error desc.
+        /// </summary>
+        /// <value>The error desc.</value>
         public string ErrorDesc { get; set; }
     }
 }

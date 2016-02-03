@@ -23,21 +23,19 @@ THE SOFTWARE.
 ****************************************************************************/
 using System;
 
-namespace ZyGames.Framework.Game.Sns
-{
+namespace ZyGames.Framework.Game.Sns {
     /// <summary>
     /// 登录处理接口
     /// </summary>
-    public interface ILogin
-    {
+    public interface ILogin {
         /// <summary>
         /// 
         /// </summary>
-        string PassportID { get;}
+        string PassportId { get; }
         /// <summary>
         /// 
         /// </summary>
-        string UserID { get; }
+        string UserId { get; }
 
         /// <summary>
         /// 用户类型
@@ -50,7 +48,7 @@ namespace ZyGames.Framework.Game.Sns
         /// <summary>
         /// 
         /// </summary>
-        string SessionID { get; }
+        string SessionId { get; }
 
         /// <summary>
         /// 注册通行证
@@ -62,7 +60,6 @@ namespace ZyGames.Framework.Game.Sns
         /// </summary>
         /// <returns></returns>
         bool CheckLogin();
-
     }
 
 }

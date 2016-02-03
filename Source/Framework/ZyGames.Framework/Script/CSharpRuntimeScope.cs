@@ -112,7 +112,6 @@ namespace ZyGames.Framework.Script
             object result;
             if (CreateInstance(code, typeName, args, out result)) return result;
             return base.Execute(scriptCode, typeName, args);
-
         }
 
         /// <summary>

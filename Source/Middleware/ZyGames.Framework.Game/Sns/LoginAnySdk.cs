@@ -35,79 +35,53 @@ using ZyGames.Framework.Common.Serialization;
 using ZyGames.Framework.Game.Configuration;
 using ZyGames.Framework.Game.Context;
 
-namespace ZyGames.Framework.Game.Sns
-{
+namespace ZyGames.Framework.Game.Sns {
     /// <summary>
     /// AnySDK
     /// </summary>
-    public class LoginAnySdk : AbstractLogin
-    {
-        private string _retailID = string.Empty;
-        private string _pid = string.Empty;
-        private string _retailUser = string.Empty;
-        private string AppId = string.Empty;
-        private string AppKey = string.Empty;
-        private string _code = string.Empty;
-        private string Url = string.Empty;
-        private string _aceessTokenUrl = string.Empty;
-        private string _appSecret = string.Empty;
-        private string _token = string.Empty;
+    public class LoginAnySdk : AbstractLogin {
+        private string retailId = string.Empty;
+        private string retailUser = string.Empty;
+        private string appId = string.Empty;
+        private string appKey = string.Empty;
+        private string url = string.Empty;
+        private string token = string.Empty;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ZyGames.Framework.Game.Sns.LoginTencent"/> class.
         /// </summary>
-        public LoginAnySdk(string retailID, string retailUser, string token, string pid) 
-        {
-            this._retailID = pid;
-            this._retailUser = retailUser;
-            this._token = token;
+        public LoginAnySdk(string retailId, string retailUser, string token) {
+            this.retailId = retailId;
+            this.retailUser = retailUser;
+            this.token = token;
             GameChannel gameChannel = ZyGameBaseConfigManager.GameSetting.GetChannelSetting(ChannelType.channelAnySDK);
-            if (gameChannel != null)
-            {
-                Url = gameChannel.Url;
+            if (gameChannel != null) {
+                url = gameChannel.Url;
             }
         }
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public override string GetRegPassport()
-        {
-            return this.PassportID;
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public override bool CheckLogin()
-        {
-            try
-            {
-                if (!string.IsNullOrEmpty(_retailUser))
-                {
-                    string[] arr = SnsManager.LoginByRetail(_retailID, _retailUser);
-                    this.UserID = arr[0];
-                    this.PassportID = arr[1];
-                    QihooUserID = _retailUser;
-                    SessionID = GetSessionId();
+        public override bool CheckLogin() {
+            try {
+                if (!string.IsNullOrEmpty(retailUser)) {
+                    string[] arr = SnsManager.LoginByRetail(retailId, retailUser);
+                    UserId = arr[0];
+                    PassportId = arr[1];
+                    RetailUserId = retailUser;
+                    SessionId = GetSessionId();
                     return true;
                 }
-                else
-                {
-                    return false;
-                }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 new BaseLog().SaveLog(e);
-                return false;
             }
+            return false;
         }
         /// <summary>
         /// 
         /// </summary>
-        public class AnySDKResult
-        {
+        public class AnySDKResult {
             /// <summary>
             /// 用于表达验证请求成功与否
             /// </summary>
@@ -130,8 +104,7 @@ namespace ZyGames.Framework.Game.Sns
         /// <summary>
         /// 
         /// </summary>
-        public class AnySDKResultdata
-        {
+        public class AnySDKResultdata {
             /// <summary>
             /// 错误编号
             /// </summary>

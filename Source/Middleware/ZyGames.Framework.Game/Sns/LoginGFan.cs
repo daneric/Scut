@@ -27,51 +27,37 @@ using System.Text;
 using System.Web;
 using ZyGames.Framework.Common.Log;
 
-namespace ZyGames.Framework.Game.Sns
-{
+namespace ZyGames.Framework.Game.Sns {
     /// <summary>
     /// 机峰0011
     /// </summary>
-    public class LoginGFan : AbstractLogin
-    {
-        private string _retailID;
-        private string _uid;
-		/// <summary>
-		/// Initializes a new instance of the <see cref="ZyGames.Framework.Game.Sns.LoginGFan"/> class.
-		/// </summary>
-		/// <param name="retailID">Retail I.</param>
-		/// <param name="RetailUser">Retail user.</param>
-        public LoginGFan(string retailID, string RetailUser)
-        {
-            this._retailID = retailID ?? "0011";
-            _uid = RetailUser.Equals("0") ? string.Empty : RetailUser;
+    public class LoginGFan : AbstractLogin {
+        private string retailId;
+        private string retailUser;
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ZyGames.Framework.Game.Sns.LoginGFan"/> class.
+        /// </summary>
+        /// <param name="retailId">Retail id.</param>
+        /// <param name="retailUser">Retail user.</param>
+        public LoginGFan(string retailId, string retailUser) {
+            this.retailId = retailId ?? "0011";
+            this.retailUser = retailUser.Equals("0") ? string.Empty : retailUser;
 
         }
-		/// <summary>
-		/// 注册通行证
-		/// </summary>
-		/// <returns></returns>
-        public override string GetRegPassport()
-        {
-            return this.PassportID;
-        }
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <returns></returns>
-        public override bool CheckLogin()
-        {
 
-            if (string.IsNullOrEmpty(_uid))
-            {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public override bool CheckLogin() {
+            if (string.IsNullOrEmpty(retailUser)) {
                 TraceLog.ReleaseWrite("The ChannelGFansdk  uid is null.");
                 return false;
             }
-
-            string[] arr = SnsManager.LoginByRetail(_retailID, _uid);
-            this.UserID = arr[0];
-            this.PassportID = arr[1];
-            SessionID = GetSessionId();
+            string[] arr = SnsManager.LoginByRetail(retailId, retailUser);
+            UserId = arr[0];
+            PassportId = arr[1];
+            SessionId = GetSessionId();
             return true;
         }
 

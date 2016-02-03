@@ -213,7 +213,7 @@ namespace ZyGames.Framework.Script
                     //replace runtime 
                     if (!isFirstRun && runtimeDomain.MainInstance != null)
                     {
-                        runtimeDomain.MainInstance.ReStart();
+                        runtimeDomain.MainInstance.Restart();
                     }
                     return scope;
                 }

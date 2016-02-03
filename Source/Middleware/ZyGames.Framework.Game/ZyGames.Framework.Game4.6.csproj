@@ -215,11 +215,11 @@
     <Compile Include="Sns\ConnectManager.cs" />
     <Compile Include="Sns\ILogin.cs" />
     <Compile Include="Sns\Login360.cs" />
-    <Compile Include="Sns\Login360_V2.cs" />
+    <Compile Include="Sns\Login360V2.cs" />
     <Compile Include="Sns\Login36you.cs" />
     <Compile Include="Sns\LoginAnySdk.cs" />
-    <Compile Include="Sns\LoginDanLe.cs" />
-    <Compile Include="Sns\LoginDanLeV2.cs" />
+    <Compile Include="Sns\LoginDangLe.cs" />
+    <Compile Include="Sns\LoginDangLeV2.cs" />
     <Compile Include="Sns\LoginFeiliu.cs" />
     <Compile Include="Sns\LoginGFan.cs" />
     <Compile Include="Sns\LoginMeiZu.cs" />

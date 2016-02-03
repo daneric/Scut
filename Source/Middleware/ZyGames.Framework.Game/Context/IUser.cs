@@ -46,7 +46,6 @@ namespace ZyGames.Framework.Game.Context
         /// 
         /// </summary>
         bool IsReplaced { get; set; }
-
         /// <summary>
         /// is online
         /// </summary>
@@ -62,10 +61,9 @@ namespace ZyGames.Framework.Game.Context
         /// <returns></returns>
         string GetPassportId();
         /// <summary>
-        /// reflesh date
+        /// refresh date
         /// </summary>
-        void RefleshOnlineDate();
-
+        void RefreshOnlineDate();
         /// <summary>
         /// 
         /// </summary>

@@ -74,12 +74,6 @@ namespace ZyGames.Framework.Game.Context
         /// <summary>
         /// 
         /// </summary>
-        [Obsolete("no use")]
-        public virtual DateTime OnlineDate { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         /// <returns></returns>
         public abstract int GetUserId();
         /// <summary>

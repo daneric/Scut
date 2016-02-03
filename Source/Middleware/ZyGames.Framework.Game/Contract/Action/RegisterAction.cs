@@ -27,61 +27,59 @@ using ZyGames.Framework.Game.Lang;
 using ZyGames.Framework.Game.Runtime;
 using ZyGames.Framework.Game.Service;
 
-namespace ZyGames.Framework.Game.Contract.Action
-{
+namespace ZyGames.Framework.Game.Contract.Action {
     /// <summary>
     /// Register action.
     /// </summary>
-    public abstract class RegisterAction : BaseStruct
-    {
+    public abstract class RegisterAction : BaseStruct {
         /// <summary>
         /// The name of the user.
         /// </summary>
-        protected string UserName;
+        protected string userName;
         /// <summary>
         /// The sex.
         /// </summary>
-        protected byte Sex;
+        protected byte sex;
         /// <summary>
         /// The head I.
         /// </summary>
-        protected string HeadID;
+        protected string avatarId;
         /// <summary>
         /// The retail I.
         /// </summary>
-        protected string RetailID;
+        protected string retailId;
         /// <summary>
         /// The pid.
         /// </summary>
-        protected string Pid;
+        protected string passportId;
         /// <summary>
         /// The type of the mobile.
         /// </summary>
-        protected MobileType MobileType;
+        protected MobileType mobileType;
         /// <summary>
         /// The screen x.
         /// </summary>
-        protected short ScreenX;
+        protected short screenX;
         /// <summary>
         /// The screen y.
         /// </summary>
-        protected short ScreenY;
+        protected short screenY;
         /// <summary>
         /// The req app version.
         /// </summary>
-        protected short ReqAppVersion;
+        protected short clientAppVersion;
         /// <summary>
         /// The game I.
         /// </summary>
-        protected int GameID;
+        protected int gameId;
         /// <summary>
         /// The server I.
         /// </summary>
-        protected int ServerID;
+        protected int serverId;
         /// <summary>
         /// The device I.
         /// </summary>
-        protected string DeviceID;
+        protected string deviceId;
         /// <summary>
         /// Gets or sets the guide identifier.
         /// </summary>
@@ -90,40 +88,35 @@ namespace ZyGames.Framework.Game.Contract.Action
         /// <summary>
         /// Initializes a new instance of the <see cref="ZyGames.Framework.Game.Contract.Action.RegisterAction"/> class.
         /// </summary>
-        /// <param name="aActionId">A action identifier.</param>
+        /// <param name="actionId">Action identifier.</param>
         /// <param name="httpGet">Http get.</param>
-        protected RegisterAction(short aActionId, ActionGetter httpGet)
-            : base(aActionId, httpGet)
-        {
+        protected RegisterAction(object actionId, ActionGetter httpGet)
+            : base(actionId, httpGet) {
         }
         /// <summary>
         /// 创建返回协议内容输出栈
         /// </summary>
-        public override void BuildPacket()
-        {
+        public override void BuildPacket() {
             PushIntoStack(GuideId);
         }
         /// <summary>
         /// 接收用户请求的参数，并根据相应类进行检测
         /// </summary>
         /// <returns></returns>
-        public override bool GetUrlElement()
-        {
-            if (actionGetter.GetString("UserName", ref UserName) &&
-                actionGetter.GetByte("Sex", ref Sex) &&
-                actionGetter.GetString("HeadID", ref HeadID) &&
-                actionGetter.GetString("RetailID", ref RetailID) &&
-                actionGetter.GetString("Pid", ref Pid, 1, int.MaxValue) &&
-                actionGetter.GetEnum("MobileType", ref MobileType)
-                )
-            {
-                UserName = UserName.Trim();
-                actionGetter.GetWord("ScreenX", ref ScreenX);
-                actionGetter.GetWord("ScreenY", ref ScreenY);
-                actionGetter.GetWord("ClientAppVersion", ref ReqAppVersion);
-                actionGetter.GetString("DeviceID", ref DeviceID);
-                actionGetter.GetInt("GameID", ref GameID);
-                actionGetter.GetInt("ServerID", ref ServerID);
+        public override bool GetUrlElement() {
+            if (actionGetter.GetString("UserName", ref userName) &&
+                actionGetter.GetByte("Sex", ref sex) &&
+                actionGetter.GetString("AvatarId", ref avatarId) &&
+                actionGetter.GetString("RetailId", ref retailId) &&
+                actionGetter.GetString("PassportId", ref passportId, 1, int.MaxValue) &&
+                actionGetter.GetEnum("MobileType", ref mobileType)) {
+                userName = userName.Trim();
+                actionGetter.GetWord("ScreenX", ref screenX);
+                actionGetter.GetWord("ScreenY", ref screenY);
+                actionGetter.GetWord("ClientAppVersion", ref clientAppVersion);
+                actionGetter.GetString("DeviceId", ref deviceId);
+                actionGetter.GetInt("GameId", ref gameId);
+                actionGetter.GetInt("ServerId", ref serverId);
                 return GetActionParam();
             }
             return false;
@@ -132,16 +125,13 @@ namespace ZyGames.Framework.Game.Contract.Action
         /// 
         /// </summary>
         /// <returns></returns>
-        public override bool CheckAction()
-        {
-            if (!GameEnvironment.IsRunning)
-            {
+        public override bool CheckAction() {
+            if (!GameEnvironment.IsRunning) {
                 ErrorCode = Language.Instance.ErrorCode;
                 ErrorInfo = Language.Instance.ServerLoading;
                 return false;
             }
-            if (Current.UserId <= 0)
-            {
+            if (Current.UserId <= 0) {
                 ErrorCode = Language.Instance.ErrorCode;
                 ErrorInfo = Language.Instance.UrlElement;
                 return false;
@@ -153,11 +143,9 @@ namespace ZyGames.Framework.Game.Contract.Action
         /// 
         /// </summary>
         /// <returns></returns>
-        public override bool TakeAction()
-        {
+        public override bool TakeAction() {
             IUser user;
-            if (CreateUserRole(out user) && Current != null && user != null)
-            {
+            if (CreateUserRole(out user) && Current != null && user != null) {
                 Current.Bind(user);
                 return true;
             }
@@ -168,8 +156,7 @@ namespace ZyGames.Framework.Game.Contract.Action
         /// 处理结束执行
         /// </summary>
         /// <param name="state">If set to <c>true</c> state.</param>
-        public override void TakeActionAffter(bool state)
-        {
+        public override void TakeActionAfter(bool state) {
         }
 
         /// <summary>

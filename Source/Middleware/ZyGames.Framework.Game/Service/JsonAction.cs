@@ -40,7 +40,7 @@ namespace ZyGames.Framework.Game.Service
         protected JsonAction(int aActionId, ActionGetter actionGetter)
             : base(aActionId, actionGetter)
         {
-            IsWebSocket = true;
+            isWebSocket = true;
             actionGetter.OpCode = OpCode.Text;
         }
 

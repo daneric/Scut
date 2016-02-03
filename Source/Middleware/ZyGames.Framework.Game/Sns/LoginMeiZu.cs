@@ -38,42 +38,33 @@ using ZyGames.Framework.Common.Serialization;
 using ZyGames.Framework.Game.Configuration;
 using ZyGames.Framework.Game.Context;
 
-namespace ZyGames.Framework.Game.Sns
-{
+namespace ZyGames.Framework.Game.Sns {
     /// <summary>
     /// AnySDK
     /// </summary>
-    public class LoginMeiZu : AbstractLogin
-    {
-        private string _retailID = string.Empty;
-        private string _retailUser = string.Empty;
-        private string _token = string.Empty;
-        private string AppId = string.Empty;
-        private string AppKey = string.Empty;
+    public class LoginMeiZu : AbstractLogin {
+        private string retailId = string.Empty;
+        private string retailUser = string.Empty;
+        private string token = string.Empty;
+        private string appId = string.Empty;
+        private string appKey = string.Empty;
         private String loginCheckUrl = "http://app.5gwan.com:9000/user/info.php";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ZyGames.Framework.Game.Sns.LoginTencent"/> class.
         /// </summary>
-        public LoginMeiZu(string retailID, string retailUser, string token)
-        {
-            _retailID = retailID;
-            _retailUser = retailUser;
-            _token = token;
-
-
+        public LoginMeiZu(string retailId, string retailUser, string token) {
+            this.retailId = retailId;
+            this.retailUser = retailUser;
+            this.token = token;
             GameChannel gameChannel = ZyGameBaseConfigManager.GameSetting.GetChannelSetting(ChannelType.channelMeiZu);
-            if (gameChannel != null)
-            {
-                GameSdkSetting setting = gameChannel.GetSetting(_retailID);
-                if (setting != null)
-                {
-                    AppKey = setting.AppKey;
-                    AppId = setting.AppId;
+            if (gameChannel != null) {
+                GameSdkSetting setting = gameChannel.GetSetting(retailId);
+                if (setting != null) {
+                    appKey = setting.AppKey;
+                    appId = setting.AppId;
                 }
-            }
-            else
-            {
+            } else {
                 TraceLog.ReleaseWrite("The sdkChannelV2 MeiZu section is null.");
             }
         }
@@ -81,49 +72,32 @@ namespace ZyGames.Framework.Game.Sns
         /// 
         /// </summary>
         /// <returns></returns>
-        public override string GetRegPassport()
-        {
-            return this.PassportID;
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns></returns>
-        public override bool CheckLogin()
-        {
-            try
-            {
-                string sign = Md5Encode(Md5Encode(AppKey + "_" + _token));
-                string queryString = string.Format("{0}?sign={1}&token={2}&app_id={3}", loginCheckUrl, sign, _token, AppId);
-
+        public override bool CheckLogin() {
+            try {
+                string sign = Md5Encode(Md5Encode(appKey + "_" + token));
+                string queryString = string.Format("{0}?sign={1}&token={2}&app_id={3}", loginCheckUrl, sign, token, appId);
 
                 var conn = (HttpWebRequest)WebRequest.Create(queryString);
                 conn.Timeout = 2000;
                 WebResponse resp = conn.GetResponse();
                 Stream stream = resp.GetResponseStream();
-                String result ="[]";
-                if (stream != null)
-                {
+                String result = "[]";
+                if (stream != null) {
                     StreamReader reader = new StreamReader(stream, Encoding.UTF8);
                     result = reader.ReadToEnd();
                     stream.Close();
                 }
                 var rejson = result.ParseJson<Rejson>();
-                if (rejson !=null && rejson.state == "1")
-                {
-                    _retailUser = rejson.data.userid;
-                    string[] arr = SnsManager.LoginByRetail(_retailID, _retailUser);
-                    this.UserID = arr[0];
-                    this.PassportID = arr[1];
-                    QihooUserID = _retailUser;
-                    SessionID = GetSessionId();
+                if (rejson != null && rejson.state == "1") {
+                    retailUser = rejson.data.userid;
+                    string[] arr = SnsManager.LoginByRetail(retailId, retailUser);
+                    UserId = arr[0];
+                    PassportId = arr[1];
+                    RetailUserId = retailUser;
+                    SessionId = GetSessionId();
                     return true;
-
                 }
-
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 new BaseLog().SaveLog(e);
             }
             return false;
@@ -132,8 +106,7 @@ namespace ZyGames.Framework.Game.Sns
         /// <summary>
         /// 
         /// </summary>
-        public class Datainfo
-        {
+        public class Datainfo {
             /// <summary>
             /// 玩家ID
             /// </summary>
@@ -148,8 +121,7 @@ namespace ZyGames.Framework.Game.Sns
         /// <summary>
         /// 
         /// </summary>
-        public class Rejson
-        {
+        public class Rejson {
             /// <summary>
             /// 状态
             /// </summary>
@@ -164,39 +136,27 @@ namespace ZyGames.Framework.Game.Sns
             /// 信息
             /// </summary>
             public string message { get; set; }
-
         }
-
-
 
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="sourceStr"></param>
+        /// <param name="str"></param>
         /// <returns></returns>
-        public static String Md5Encode(String sourceStr)
-        {
-            try
-            {
-                byte[] bytes = Encoding.UTF8.GetBytes(sourceStr);
-                using (MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider())
-                {
+        public static String Md5Encode(String str) {
+            try {
+                byte[] bytes = Encoding.UTF8.GetBytes(str);
+                using (MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider()) {
                     byte[] result = md5.ComputeHash(bytes);
-
                     var sBuilder = new StringBuilder();
-                    foreach (byte t in result)
+                    foreach (byte t in result) {
                         sBuilder.Append(t.ToString("x2"));
-
+                    }
                     return sBuilder.ToString();
                 }
-            }
-            catch (Exception)
-            {
+            } catch (Exception) {
             }
             return null;
-
         }
-
-
     }
 }

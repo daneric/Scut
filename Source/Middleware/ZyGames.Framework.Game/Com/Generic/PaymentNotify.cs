@@ -28,35 +28,28 @@ using ZyGames.Framework.Game.Context;
 using ZyGames.Framework.Game.Pay;
 using ZyGames.Framework.Game.Runtime;
 
-namespace ZyGames.Framework.Game.Com.Generic
-{
+namespace ZyGames.Framework.Game.Com.Generic {
     /// <summary>
     /// 付款通知
     /// </summary>
     [Serializable, ProtoContract]
-    public abstract class PaymentNotify
-    {
+    public abstract class PaymentNotify {
         /// <summary>
         /// 
         /// </summary>
         /// <param name="user"></param>
-        public void Notify(IUser user)
-        {
+        public void Notify(IUser user) {
             int gameId = GameEnvironment.ProductCode;
             int serverId = GameEnvironment.ProductServerId;
             int userId = user.GetUserId();
             string pid = user.GetPassportId();
-            OrderInfo[] orderList = PayManager.getPayment(gameId, serverId, pid);
-            foreach (var orderInfo in orderList)
-            {
-                if (DoNotify(userId, orderInfo))
-                {
-                    PayManager.Abnormal(orderInfo.OrderNO);
-                    TraceLog.ReleaseWriteFatal("Payment order:{0},Pid:{1} notify success", orderInfo.OrderNO, pid);
-                }
-                else
-                {
-                    TraceLog.ReleaseWriteFatal("Payment order:{0},Pid:{1} notify faild", orderInfo.OrderNO, pid);
+            OrderInfo[] orderList = PayManager.GetPayment(gameId, serverId, pid);
+            foreach (var orderInfo in orderList) {
+                if (DoNotify(userId, orderInfo)) {
+                    PayManager.Abnormal(orderInfo.OrderNo);
+                    TraceLog.ReleaseWriteFatal("Payment order:{0},Pid:{1} notify success", orderInfo.OrderNo, pid);
+                } else {
+                    TraceLog.ReleaseWriteFatal("Payment order:{0},Pid:{1} notify faild", orderInfo.OrderNo, pid);
                 }
             }
         }

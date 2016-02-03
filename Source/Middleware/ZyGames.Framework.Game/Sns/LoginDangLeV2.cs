@@ -30,99 +30,78 @@ using ZyGames.Framework.Common.Serialization;
 using ZyGames.Framework.Game.Configuration;
 using ZyGames.Framework.Game.Context;
 
-namespace ZyGames.Framework.Game.Sns
-{
+namespace ZyGames.Framework.Game.Sns {
     /// <summary>
     /// 当乐0037
     /// </summary>
-    public class LoginDanLeV2 : AbstractLogin
-    {
-        private string _retailID;
-        private string _mid;
-        private string _token;
-        private string username = string.Empty;
+    public class LoginDangLeV2 : AbstractLogin {
+        private string retailId;
+        private string mid;
+        private string token;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ZyGames.Framework.Game.Sns.LoginDanLeV2"/> class.
+        /// Initializes a new instance of the <see cref="ZyGames.Framework.Game.Sns.LoginDangLeV2"/> class.
         /// </summary>
-        /// <param name="retailID">Retail I.</param>
-        /// <param name="RetailUser">Retail user.</param>
+        /// <param name="retailId">Retail I.</param>
+        /// <param name="mid">Middle.</param>
         /// <param name="token">Token.</param>
-        public LoginDanLeV2(string retailID, string RetailUser, string token)
-        {
-            this._retailID = retailID ?? "0037";
-            _mid = RetailUser.Equals("0") ? string.Empty : RetailUser;
-            _token = token;
+        public LoginDangLeV2(string retailId, string mid, string token) {
+            this.retailId = retailId ?? "0037";
+            this.mid = mid.Equals("0") ? string.Empty : mid;
+            this.token = token;
         }
-        /// <summary>
-        /// 注册通行证
-        /// </summary>
-        /// <returns></returns>
-        public override string GetRegPassport()
-        {
-            return this.PassportID;
-        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        public override bool CheckLogin()
-        {
+        public override bool CheckLogin() {
             string url = "";
-            string AppKey = "";
-            string AppId = "";
+            string appId = "";
+            string appKey = "";
             bool isOldVersion = false;
 
             GameChannel gameChannel = ZyGameBaseConfigManager.GameSetting.GetChannelSetting(ChannelType.channelDanle);
-            if (gameChannel != null)
-            {
+            if (gameChannel != null) {
                 url = gameChannel.Url;
                 isOldVersion = "0.1".Equals(gameChannel.Version);
-                GameSdkSetting setting = gameChannel.GetSetting(_retailID);
-                if (setting != null)
-                {
-                    AppKey = setting.AppKey;
-                    AppId = setting.AppId;
+                GameSdkSetting setting = gameChannel.GetSetting(retailId);
+                if (setting != null) {
+                    appId = setting.AppId;
+                    appKey = setting.AppKey;
                 }
+            } else {
+                TraceLog.ReleaseWrite("The sdkChannelV2 Dangle section is null.");
             }
-            else
-            {
-                TraceLog.ReleaseWrite("The sdkChannelV2 Danle section is null.");
-            }
-            string sig = AMD5(_token + "|" + AppKey);
-            string Url = string.Format("{0}?app_id={1}&mid={2}&token={3}&sig={4}", url, AppId, _mid, _token, sig);
+            string sig = MD5(token + "|" + appKey);
+            string Url = string.Format("{0}?app_id={1}&mid={2}&token={3}&sig={4}", url, appId, mid, token, sig);
             string result = HttpRequestManager.GetStringData(Url, "GET");
 
-            DanleSDK sdk = null;
-            try
-            {
-                sdk = JsonUtils.Deserialize<DanleSDK>(result);
-            }
-            catch (Exception ex)
-            {
+            DangLeV2SDK sdk = null;
+            try {
+                sdk = JsonUtils.Deserialize<DangLeV2SDK>(result);
+            } catch (Exception ex) {
                 new BaseLog().SaveLog(ex);
                 return false;
             }
-            if (sdk == null || sdk.error_code != 0 || sdk.memberId == null)
-            {
+            if (sdk == null || sdk.error_code != 0 || sdk.memberId == null) {
                 TraceLog.ReleaseWrite("Danlesdk login fail:{0},request url:{1}", result, Url);
                 return false;
             }
 
-            string[] arr = SnsManager.LoginByRetail(_retailID, sdk.memberId);
-            this.UserID = arr[0];
-            this.PassportID = arr[1];
-            SessionID = GetSessionId();
+            string[] arr = SnsManager.LoginByRetail(retailId, sdk.memberId);
+            UserId = arr[0];
+            PassportId = arr[1];
+            SessionId = GetSessionId();
             return true;
         }
 
 
     }
     /// <summary>
-    /// Danle v2 SD.
+    /// DangLe v2 SDK.
     /// </summary>
-    public class DanleV2SDK
-    {
+    public class DangLeV2SDK {
         /// <summary>
         /// The member identifier.
         /// </summary>
